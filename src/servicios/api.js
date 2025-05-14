@@ -1,4 +1,4 @@
-const API_BASE = 'https://www.bakend-notas.somee.com';
+const API_BASE = 'http://www.bakend-notas.somee.com';
 
 export const loginUsuario = async (usuario, pass) => {
   try {

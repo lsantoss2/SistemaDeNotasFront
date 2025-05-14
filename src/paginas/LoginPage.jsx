@@ -27,7 +27,6 @@ export default function LoginPage() {
       <div className="login-left">
         <h1>¡Bienvenido!</h1>
         <p>Visualiza y gestiona las notas académicas de forma rápida y segura.</p>
-        <img src="/assets/clipboard.png" alt="Ilustración" />
       </div>
 
       {/* Panel derecho */}
@@ -54,7 +53,6 @@ export default function LoginPage() {
           <button type="submit">Ingresar</button>
 
           <div className="forgot-password">
-            <a href="#">¿Olvidaste tu contraseña?</a>
           </div>
         </form>
       </div>

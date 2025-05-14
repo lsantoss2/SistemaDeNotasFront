@@ -47,3 +47,25 @@
     background-color: #f9fbfe;
   }
   
+  .cerrar-sesion-contenedor {
+    margin-top: auto;
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  .btn-cerrar-sesion {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    width: 100%;
+  }
+  
+  .btn-cerrar-sesion:hover {
+    background-color: #dc2626;
+  }
+  

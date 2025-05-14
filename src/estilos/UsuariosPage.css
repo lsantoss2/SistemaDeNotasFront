@@ -1,0 +1,33 @@
+.usuarios-page {
+    padding: 2rem;
+  }
+  
+  .formulario-usuario {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    margin-top: 2rem;
+  }
+  
+  .formulario-usuario input,
+  .formulario-usuario select {
+    margin-bottom: 1rem;
+    padding: 0.7rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .formulario-usuario button {
+    background-color: #1d4ed8;
+    color: white;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .formulario-usuario button:hover {
+    background-color: #1e40af;
+  }
+  

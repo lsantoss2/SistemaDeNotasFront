@@ -5,6 +5,9 @@ import DashboardPage from './paginas/DashboardPage';
 import EstudiantesPage from './paginas/EstudiantesPage';
 import Layout from './componentes/Layout';
 import RutaPrivada from './componentes/RutaPrivada';
+import UsuariosPage from './paginas/UsuariosPage'; // Importar la nueva página
+import InformacionPerfilPage from './paginas/InformacionPerfilPage';
+
 
 export default function App() {
   return (
@@ -14,6 +17,9 @@ export default function App() {
       <Route path="/" element={<RutaPrivada><Layout /></RutaPrivada>}>
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="estudiantes" element={<EstudiantesPage />} />
+        <Route path="/usuarios" element={<UsuariosPage />} />
+        <Route path="/estudiantes/:id" element={<InformacionPerfilPage />} />
+
       </Route>
     </Routes>
   );
