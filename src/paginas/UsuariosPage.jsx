@@ -86,7 +86,7 @@ export default function UsuariosPage() {
       id_usuario: user.id_usuario,
       usuario: user.usuario,
       nombre: user.nombre,
-      apellidos: user.apellidos,
+      apellidos: user.apellido,
       contrasena: user.contrasena,
       rol: user.rol
     });
@@ -134,7 +134,7 @@ export default function UsuariosPage() {
     const texto = filtroTexto.toLowerCase();
     const coincide =
     (u.nombre || '').toLowerCase().includes(texto) ||
-    (u.apellidos || '').toLowerCase().includes(texto) ||
+    (u.apellido || '').toLowerCase().includes(texto) ||
     (u.usuario || '').toLowerCase().includes(texto) ||
     (obtenerNombreRol(u.rol) || '').toLowerCase().includes(texto);
   
@@ -164,7 +164,7 @@ export default function UsuariosPage() {
       <div className="filtros-usuarios" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
         <input
           type="text"
-          placeholder="Buscar por nombre, apellidos, usuario o rol..."
+          placeholder="Buscar por nombre, apellido, usuario o rol..."
           value={filtroTexto}
           onChange={(e) => setFiltroTexto(e.target.value)}
           className="input"
@@ -183,7 +183,7 @@ export default function UsuariosPage() {
           <tr>
             <th>#</th>
             <th>Nombre</th>
-            <th>Apellidos</th>
+            <th>apellido</th>
             <th>Usuario</th>
             <th>Rol</th>
             <th>Acción</th>
@@ -194,7 +194,7 @@ export default function UsuariosPage() {
             <tr key={u.id_usuario}>
               <td>{idx + 1}</td>
               <td>{u.nombre}</td>
-              <td>{u.apellidos}</td>
+              <td>{u.apellido}</td>
               <td>{u.usuario}</td>
               <td>{obtenerNombreRol(u.rol)}</td>
               <td>
@@ -210,7 +210,7 @@ export default function UsuariosPage() {
         <form className="formulario-usuario" onSubmit={handleSubmit}>
           <h3>{modoEdicion ? 'Editar Usuario' : 'Registrar Usuario'}</h3>
           <input name="nombre" placeholder="Nombre" value={formulario.nombre} onChange={handleChange} required />
-          <input name="apellidos" placeholder="Apellidos" value={formulario.apellidos} onChange={handleChange} required />
+          <input name="apellido" placeholder="apellido" value={formulario.apellido} onChange={handleChange} required />
           <input name="usuario" placeholder="Usuario" value={formulario.usuario} onChange={handleChange} required disabled={modoEdicion} />
           <input type="password" name="contrasena" placeholder="Contraseña" value={formulario.contrasena} onChange={handleChange} required />
           <select name="rol" value={formulario.rol} onChange={handleChange} required>

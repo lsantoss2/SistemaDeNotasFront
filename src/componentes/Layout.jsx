@@ -21,11 +21,11 @@ export default function Layout() {
         <div className="logo">Sistema</div>
         <nav>
           <ul>
-            <li><Link to="/dashboard">Dashboard</Link></li>
 
             {/* ADMINISTRADOR: acceso total */}
             {rol === 0 && (
               <>
+                <li><Link to="/dashboard">Dashboard</Link></li>
                 <li><Link to="/estudiantes">Estudiantes</Link></li>
                 <li><Link to="/profesores">Profesores</Link></li>
                 <li><Link to="/padres">Padres</Link></li>

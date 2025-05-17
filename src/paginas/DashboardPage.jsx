@@ -30,7 +30,6 @@ export default function DashboardPage() {
     <main className="main">
       <header className="header">
         <h2>Bienvenido, {getRolNombre(usuario.rol)} {usuario.nombre}</h2>
-        <span>Año Escolar 2024 - 2025</span>
       </header>
 
       <div className="powerbi-dashboard" style={{ marginTop: '20px', width: '100%' }}>
