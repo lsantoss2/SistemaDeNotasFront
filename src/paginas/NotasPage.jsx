@@ -1,267 +1,360 @@
 import React, { useEffect, useState } from 'react';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
-export default function ProfesoresPage() {
-  const [profesores, setProfesores] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
-  const [combinedData, setCombinedData] = useState([]);
-  const [busqueda, setBusqueda] = useState('');
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [modoEdicion, setModoEdicion] = useState(false);
-  const [formulario, setFormulario] = useState({
-    id_prof: '',
-    dpi: '',
-    fecha: '',
-    id_usuario: ''
+export default function NotasPage() {
+  const [allNotas, setAllNotas] = useState([]);
+  const [filteredNotas, setFilteredNotas] = useState([]);
+  const [filtros, setFiltros] = useState({
+    id_curso: '',
+    id_estudiante: '',
+    unidad: '',
+    id_ciclo: ''
   });
+  const [cursos, setCursos] = useState([]);
+  const [estudiantes, setEstudiantes] = useState([]);
+  const [ciclos, setCiclos] = useState([]);
+  const [grados, setGrados] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [formulario, setFormulario] = useState({
+    id_curso: '',
+    id_estudiante: '',
+    nota: '',
+    unidad: '',
+    grado: '',
+    ciclo: ''
+  });
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [idEditando, setIdEditando] = useState(null);
 
   useEffect(() => {
-    obtenerDatos();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [cursosRes, estudiantesRes, ciclosRes, gradosRes, notasRes] = await Promise.all([
+          fetch('http://www.bakend-notas.somee.com/Curso/Buscar'),
+          fetch('http://www.bakend-notas.somee.com/Estudiante/Buscar'),
+          fetch('http://www.bakend-notas.somee.com/Ciclo/Buscar'),
+          fetch('http://www.bakend-notas.somee.com/Grado/Buscar'),
+          fetch('http://www.bakend-notas.somee.com/Notas/Buscar')
+        ]);
+
+        const cursosData = await cursosRes.json();
+        const estudiantesData = await estudiantesRes.json();
+        const ciclosData = await ciclosRes.json();
+        const gradosData = await gradosRes.json();
+        const notasData = await notasRes.json();
+
+        setCursos(cursosData);
+        setEstudiantes(estudiantesData);
+        setCiclos(ciclosData);
+        setGrados(gradosData);
+        setAllNotas(notasData);
+        setFilteredNotas(notasData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        alert("❌ Error al cargar datos");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const obtenerDatos = async () => {
-    try {
-      const [profRes, userRes] = await Promise.all([
-        fetch('http://www.bakend-notas.somee.com/Profesores/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Usuario/Buscar')
-      ]);
+  useEffect(() => {
+    applyFilters();
+  }, [filtros, allNotas]);
 
-      const profesoresData = await profRes.json();
-      const usuariosData = await userRes.json();
+  const applyFilters = () => {
+    const filtered = allNotas.filter(nota => {
+      if (filtros.id_curso && nota.id_curso !== parseInt(filtros.id_curso)) return false;
+      if (filtros.id_estudiante && nota.id_estudiante !== parseInt(filtros.id_estudiante)) return false;
+      if (filtros.unidad && nota.unidad !== parseInt(filtros.unidad)) return false;
+      if (filtros.id_ciclo && nota.ciclo !== parseInt(filtros.id_ciclo)) return false;
+      return true;
+    });
+    setFilteredNotas(filtered);
+  };
 
-      setProfesores(profesoresData);
-      setUsuarios(usuariosData);
-
-      const combinados = profesoresData.map(prof => {
-        const user = usuariosData.find(u => u.id_usuario === prof.id_usuario) || {};
-        return {
-          ...prof,
-          usuario: user.usuario || 'N/A',
-          nombre: user.nombre || 'N/A',
-          apellido: user.apellido || 'N/A',
-          rol: user.rol ?? 'N/A'
-        };
-      });
-
-      setCombinedData(combinados);
-    } catch (error) {
-      console.error('❌ Error al obtener datos:', error);
-    }
+  const handleFilterChange = (e) => {
+    setFiltros({ ...filtros, [e.target.name]: e.target.value });
   };
 
   const handleChange = (e) => {
-    setFormulario({
-      ...formulario,
-      [e.target.name]: e.target.value
-    });
+    setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
-  const handleRegistrar = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { dpi, fecha, id_usuario } = formulario;
 
-    if (!dpi || !fecha || !id_usuario) {
-      alert("❌ Todos los campos son obligatorios");
-      return;
-    }
+    const notaData = {
+      id_curso: parseInt(formulario.id_curso),
+      id_estudiante: parseInt(formulario.id_estudiante),
+      nota: parseFloat(formulario.nota),
+      unidad: parseInt(formulario.unidad),
+      grado: parseInt(formulario.grado),
+      ciclo: parseInt(formulario.ciclo)
+    };
 
-    const url = `http://www.bakend-notas.somee.com/Profesores/Ingresar?DPI=${dpi}&fecha_contratacion=${fecha}&id_usuario=${id_usuario}`;
+    const url = modoEdicion
+      ? `http://www.bakend-notas.somee.com/Notas/Modificar?id_nota=${idEditando}`
+      : 'http://www.bakend-notas.somee.com/Notas/Ingresar';
 
     try {
-      const res = await fetch(url, { method: 'POST' });
-      const texto = await res.text();
+      const res = await fetch(url, {
+        method: modoEdicion ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(notaData)
+      });
 
       if (res.ok) {
-        alert("✅ Profesor registrado correctamente");
-        setFormulario({ id_prof: '', dpi: '', fecha: '', id_usuario: '' });
-        setMostrarFormulario(false);
-        obtenerDatos();
+        alert(modoEdicion ? '✅ Nota actualizada' : '✅ Nota registrada');
+        resetForm();
+        const notasRes = await fetch('http://www.bakend-notas.somee.com/Notas/Buscar');
+        const notasData = await notasRes.json();
+        setAllNotas(notasData);
       } else {
-        alert("❌ Error al registrar\n" + texto);
+        const errorText = await res.text();
+        alert(`❌ Error al registrar/modificar nota: ${errorText}`);
       }
     } catch (error) {
-      alert("❌ Error de conexión");
+      alert("❌ Error del servidor");
       console.error(error);
     }
   };
 
-  const handleEditar = (prof) => {
+  const handleEditar = (nota) => {
     setFormulario({
-      id_prof: prof.id_prof,
-      dpi: prof.dpi,
-      fecha: prof.fecha,
-      id_usuario: prof.id_usuario
+      id_curso: nota.id_curso.toString(),
+      id_estudiante: nota.id_estudiante.toString(),
+      nota: nota.nota.toString(),
+      unidad: nota.unidad.toString(),
+      grado: nota.grado.toString(),
+      ciclo: nota.ciclo.toString()
     });
+    setIdEditando(nota.id_nota);
     setModoEdicion(true);
-    setMostrarFormulario(true);
   };
 
-  const handleModificar = async (e) => {
-    e.preventDefault();
-    const { id_prof, dpi, fecha, id_usuario } = formulario;
-
-    const query = new URLSearchParams({
-      id: id_prof,
-      DPI: dpi,
-      fecha_contratacion: fecha,
-      id_usuario
-    });
-
+  const handleEliminar = async (id_nota) => {
+    if (!confirm('¿Eliminar esta nota?')) return;
     try {
-      const res = await fetch(`http://www.bakend-notas.somee.com/Profesores/Modificar?${query.toString()}`, {
-        method: 'PUT'
-      });
-      const texto = await res.text();
-
-      if (res.ok) {
-        alert("✅ Profesor modificado");
-        setFormulario({ id_prof: '', dpi: '', fecha: '', id_usuario: '' });
-        setModoEdicion(false);
-        setMostrarFormulario(false);
-        obtenerDatos();
-      } else {
-        alert("❌ Error al modificar\n" + texto);
-      }
-    } catch (error) {
-      console.error('❌ Error al modificar:', error);
-    }
-  };
-
-  const handleEliminar = async (id_prof) => {
-    if (!confirm(`¿Eliminar al profesor con ID ${id_prof}?`)) return;
-
-    try {
-      const res = await fetch(`http://www.bakend-notas.somee.com/Profesores/Eliminar?id=${id_prof}`, {
+      const res = await fetch(`http://www.bakend-notas.somee.com/Notas/Eliminar?id_nota=${id_nota}`, {
         method: 'DELETE'
       });
-
-      const texto = await res.text();
-
       if (res.ok) {
-        alert('🗑️ Profesor eliminado');
-        obtenerDatos();
+        alert('🗑️ Nota eliminada');
+        const notasRes = await fetch('http://www.bakend-notas.somee.com/Notas/Buscar');
+        const notasData = await notasRes.json();
+        setAllNotas(notasData);
       } else {
-        alert(`❌ No se pudo eliminar\n${texto}`);
+        alert('❌ No se pudo eliminar');
       }
     } catch (error) {
-      alert('❌ Error al eliminar profesor');
-      console.error(error);
+      alert('❌ Error del servidor');
     }
   };
 
-  const profesoresFiltrados = combinedData.filter(p => {
-    const texto = busqueda.toLowerCase();
-    return (
-      p.dpi.toLowerCase().includes(texto) ||
-      p.fecha.toLowerCase().includes(texto) ||
-      p.usuario?.toLowerCase().includes(texto) ||
-      p.nombre?.toLowerCase().includes(texto) ||
-      p.apellido?.toLowerCase().includes(texto) ||
-      String(p.id_usuario).includes(texto)
-    );
-  });
+  const resetForm = () => {
+    setFormulario({
+      id_curso: '',
+      id_estudiante: '',
+      nota: '',
+      unidad: '',
+      grado: '',
+      ciclo: ''
+    });
+    setModoEdicion(false);
+    setIdEditando(null);
+  };
 
-  const obtenerNombreRol = (rol) => {
-    switch (rol) {
-      case 0: return "Administrador";
-      case 1: return "Profesor";
-      case 2: return "Tutor";
-      default: return "Desconocido";
-    }
+  const getNombreCurso = (id) => {
+    const curso = cursos.find(c => c.id_curso === id);
+    return curso ? curso.nombre : 'N/A';
+  };
+
+  const getNombreEstudiante = (id) => {
+    const estudiante = estudiantes.find(e => e.id_estudiante === id);
+    return estudiante ? `${estudiante.nombre} ${estudiante.apellido}` : 'N/A';
+  };
+
+  const getNombreGrado = (id) => {
+    const grado = grados.find(g => g.id === id);
+    return grado ? grado.nombre : 'N/A';
+  };
+
+  const getCiclo = (id) => {
+    const ciclo = ciclos.find(c => c.id_ciclo === id);
+    return ciclo ? ciclo.ciclo : 'N/A';
   };
 
   const exportarPDF = () => {
     const doc = new jsPDF();
-    doc.text("Listado de Profesores", 14, 16);
-    const tableColumn = ["ID", "Nombre", "Apellido", "Usuario", "DPI", "Fecha Contratación", "ID Usuario", "Rol"];
-    const tableRows = profesoresFiltrados.map(p => [
-      p.id_prof,
-      p.nombre,
-      p.apellido,
-      p.usuario,
-      p.dpi,
-      p.fecha,
-      p.id_usuario,
-      obtenerNombreRol(p.rol)
+    doc.text("Reporte de Notas", 14, 15);
+
+    const tableColumn = ["#", "Curso", "Estudiante", "Nota", "Unidad", "Grado", "Ciclo"];
+    const tableRows = filteredNotas.map((n, i) => [
+      i + 1,
+      getNombreCurso(n.id_curso),
+      getNombreEstudiante(n.id_estudiante),
+      n.nota,
+      n.unidad,
+      getNombreGrado(n.grado),
+      getCiclo(n.ciclo)
     ]);
-    doc.autoTable({
+
+    autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 20
+      startY: 20,
     });
-    doc.save("profesores.pdf");
+
+    doc.save("notas_reporte.pdf");
   };
 
   return (
-    <div className="contenedor">
-      <h2>Profesores Registrados</h2>
+    <div className="container">
+      <h2>Notas de Clases</h2>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-        <button onClick={() => {
-          setFormulario({ id_prof: '', dpi: '', fecha: '', id_usuario: '' });
-          setModoEdicion(false);
-          setMostrarFormulario(true);
-        }}>+ Agregar Profesor</button>
+      <div className="filters">
+        <h3>Filtrar Notas</h3>
+        <div className="filter-fields">
+          <select name="id_curso" value={filtros.id_curso} onChange={handleFilterChange}>
+            <option value="">Todos los cursos</option>
+            {cursos.map(curso => (
+              <option key={curso.id_curso} value={curso.id_curso}>{curso.nombre}</option>
+            ))}
+          </select>
 
-        <button onClick={exportarPDF}>📄 Exportar PDF</button>
+          <select name="id_estudiante" value={filtros.id_estudiante} onChange={handleFilterChange}>
+            <option value="">Todos los estudiantes</option>
+            {estudiantes.map(est => (
+              <option key={est.id_estudiante} value={est.id_estudiante}>
+                {est.nombre} {est.apellido}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="number"
+            name="unidad"
+            placeholder="Unidad"
+            value={filtros.unidad}
+            onChange={handleFilterChange}
+            min="1"
+          />
+
+          <select name="id_ciclo" value={filtros.id_ciclo} onChange={handleFilterChange}>
+            <option value="">Todos los ciclos</option>
+            {ciclos.map(ciclo => (
+              <option key={ciclo.id_ciclo} value={ciclo.id_ciclo}>{ciclo.ciclo}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <input
-        type="text"
-        placeholder="Buscar..."
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-        style={{ marginBottom: '10px', width: '100%' }}
-      />
+      <button onClick={exportarPDF} style={{ margin: '10px 0' }}>
+        📄 Exportar PDF
+      </button>
 
-      <table>
+      <table className="tabla">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Usuario</th>
-            <th>DPI</th>
-            <th>Fecha Contratación</th>
-            <th>ID Usuario</th>
-            <th>Rol</th>
+            <th>#</th>
+            <th>Curso</th>
+            <th>Estudiante</th>
+            <th>Nota</th>
+            <th>Unidad</th>
+            <th>Grado</th>
+            <th>Ciclo</th>
             <th>Acción</th>
           </tr>
         </thead>
         <tbody>
-          {profesoresFiltrados.map((p) => (
-            <tr key={p.id_prof}>
-              <td>{p.id_prof}</td>
-              <td>{p.nombre}</td>
-              <td>{p.apellido}</td>
-              <td>{p.usuario}</td>
-              <td>{p.dpi}</td>
-              <td>{p.fecha}</td>
-              <td>{p.id_usuario}</td>
-              <td>{obtenerNombreRol(p.rol)}</td>
-              <td>
-                <button onClick={() => handleEditar(p)}>✏️</button>
-                <button onClick={() => handleEliminar(p.id_prof)}>🗑️</button>
+          {filteredNotas.length === 0 ? (
+            <tr>
+              <td colSpan="8" style={{ textAlign: 'center' }}>
+                {loading ? 'Cargando...' : 'No hay notas disponibles. Use los filtros para buscar.'}
               </td>
             </tr>
-          ))}
+          ) : (
+            filteredNotas.map((n, i) => (
+              <tr key={i}>
+                <td>{i + 1}</td>
+                <td>{getNombreCurso(n.id_curso)}</td>
+                <td>{getNombreEstudiante(n.id_estudiante)}</td>
+                <td>{n.nota}</td>
+                <td>{n.unidad}</td>
+                <td>{getNombreGrado(n.grado)}</td>
+                <td>{getCiclo(n.ciclo)}</td>
+                <td>
+                  <button onClick={() => handleEditar(n)}>✏️</button>
+                  <button onClick={() => handleEliminar(n.id_nota)}>🗑️</button>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
 
-      {mostrarFormulario && (
-        <form onSubmit={modoEdicion ? handleModificar : handleRegistrar} style={{ marginTop: '2rem' }}>
-          <h3>{modoEdicion ? 'Editar Profesor' : 'Registrar Profesor'}</h3>
-          {modoEdicion && <input name="id_prof" placeholder="ID" value={formulario.id_prof} onChange={handleChange} required readOnly />}
-          <input name="dpi" placeholder="DPI" value={formulario.dpi} onChange={handleChange} required />
-          <input type="date" name="fecha" placeholder="Fecha de Contratación" value={formulario.fecha} onChange={handleChange} required />
-          <input name="id_usuario" placeholder="ID Usuario" type="number" value={formulario.id_usuario} onChange={handleChange} required />
-          <div style={{ marginTop: '10px' }}>
-            <button type="submit">{modoEdicion ? 'Guardar Cambios' : 'Registrar'}</button>
-            <button type="button" onClick={() => setMostrarFormulario(false)} style={{ marginLeft: '10px' }}>Cancelar</button>
-          </div>
-        </form>
-      )}
+      <h3>{modoEdicion ? 'Editar Nota' : 'Registrar Nota'}</h3>
+      <form onSubmit={handleSubmit}>
+        <select name="id_curso" value={formulario.id_curso} onChange={handleChange} required>
+          <option value="">Seleccionar curso</option>
+          {cursos.map(curso => (
+            <option key={curso.id_curso} value={curso.id_curso}>{curso.nombre}</option>
+          ))}
+        </select>
+
+        <select name="id_estudiante" value={formulario.id_estudiante} onChange={handleChange} required>
+          <option value="">Seleccionar estudiante</option>
+          {estudiantes.map(est => (
+            <option key={est.id_estudiante} value={est.id_estudiante}>
+              {est.nombre} {est.apellido}
+            </option>
+          ))}
+        </select>
+
+        <input
+          type="number"
+          name="nota"
+          placeholder="Nota (0-100)"
+          value={formulario.nota}
+          onChange={handleChange}
+          required
+          min="0"
+          max="100"
+          step="0.01"
+        />
+
+        <input
+          type="number"
+          name="unidad"
+          placeholder="Unidad"
+          value={formulario.unidad}
+          onChange={handleChange}
+          required
+          min="1"
+        />
+
+        <select name="grado" value={formulario.grado} onChange={handleChange} required>
+          <option value="">Seleccionar grado</option>
+          {grados.map(grado => (
+            <option key={grado.id} value={grado.id}>{grado.nombre}</option>
+          ))}
+        </select>
+
+        <select name="ciclo" value={formulario.ciclo} onChange={handleChange} required>
+          <option value="">Seleccionar ciclo</option>
+          {ciclos.map(ciclo => (
+            <option key={ciclo.id_ciclo} value={ciclo.id_ciclo}>{ciclo.ciclo}</option>
+          ))}
+        </select>
+
+        <button type="submit">{modoEdicion ? 'Actualizar' : 'Registrar'}</button>
+        {modoEdicion && <button type="button" onClick={resetForm}>Cancelar</button>}
+      </form>
     </div>
   );
 }
