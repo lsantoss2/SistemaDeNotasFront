@@ -33,36 +33,17 @@ export default function DashboardPage() {
         <span>Año Escolar 2024 - 2025</span>
       </header>
 
-      <section className="stats">
-        <div className="card stat">Colegios: 3</div>
-        <div className="card stat">Profesores: 85</div>
-        <div className="card stat">Alumnos: 1240</div>
-        <div className="card stat">Padres: 820</div>
-      </section>
-
-      <section className="middle">
-        <div className="calendar card">📅 Calendario (próximamente)</div>
-        <div className="graph card">📊 Gráfico (próximamente)</div>
-      </section>
-
-      <section className="bottom">
-        <div className="events card">
-          <h3>Próximos Eventos</h3>
-          <ul>
-            <li>📌 Evaluaciones 1er Trimestre</li>
-            <li>📌 Reunión con padres</li>
-            <li>📌 Día del Maestro</li>
-          </ul>
-        </div>
-        <div className="top-students card">
-          <h3>Estudiantes Destacados</h3>
-          <ul>
-            <li>Daniel López - 98.5%</li>
-            <li>Lucía Ramírez - 97.8%</li>
-            <li>Kevin Pérez - 97.0%</li>
-          </ul>
-        </div>
-      </section>
+      <div className="powerbi-dashboard" style={{ marginTop: '20px', width: '100%' }}>
+        <iframe
+          title="notas"
+          width="100%"
+          height="600"
+          src="https://app.powerbi.com/view?r=eyJrIjoiMmEzMzY0ZDQtYmEzMS00MTE5LWFkZDEtZWY5ZDc0MzNkNmUyIiwidCI6IjVmNTNiNGNlLTYzZDQtNGVlOC04OGQyLTIyZjBiMmQ0YjI3YSIsImMiOjR9"
+          frameBorder="0"
+          allowFullScreen={true}
+          style={{ border: 'none' }}
+        ></iframe>
+      </div>
     </main>
   );
 }
