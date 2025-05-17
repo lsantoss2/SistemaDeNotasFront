@@ -7,15 +7,14 @@ export default function UsuariosPage() {
     id_usuario: '',
     usuario: '',
     nombre: '',
-    apellido: '',
-    pass: '',
+    apellidos: '',
+    contrasena: '',
     rol: ''
   });
   const [modoEdicion, setModoEdicion] = useState(false);
   const [usuarioEditando, setUsuarioEditando] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-  // Filtros
   const [filtroTexto, setFiltroTexto] = useState('');
   const [filtroRol, setFiltroRol] = useState('');
 
@@ -61,7 +60,14 @@ export default function UsuariosPage() {
 
       if (res.ok) {
         alert(modoEdicion ? '✅ Usuario modificado' : '✅ Usuario creado');
-        setFormulario({ id_usuario: '', usuario: '', nombre: '', apellido: '', pass: '', rol: '' });
+        setFormulario({
+          id_usuario: '',
+          usuario: '',
+          nombre: '',
+          apellidos: '',
+          contrasena: '',
+          rol: ''
+        });
         setModoEdicion(false);
         setUsuarioEditando(null);
         setMostrarFormulario(false);
@@ -80,8 +86,8 @@ export default function UsuariosPage() {
       id_usuario: user.id_usuario,
       usuario: user.usuario,
       nombre: user.nombre,
-      apellido: user.apellido,
-      pass: user.pass,
+      apellidos: user.apellidos,
+      contrasena: user.contrasena,
       rol: user.rol
     });
     setModoEdicion(true);
@@ -124,15 +130,14 @@ export default function UsuariosPage() {
     }
   };
 
-  // 🔎 Filtro por múltiples columnas
   const usuariosFiltrados = usuarios.filter((u) => {
     const texto = filtroTexto.toLowerCase();
     const coincide =
-      u.nombre.toLowerCase().includes(texto) ||
-      u.apellido.toLowerCase().includes(texto) ||
-      u.usuario.toLowerCase().includes(texto) ||
-      obtenerNombreRol(u.rol).toLowerCase().includes(texto);
-
+    (u.nombre || '').toLowerCase().includes(texto) ||
+    (u.apellidos || '').toLowerCase().includes(texto) ||
+    (u.usuario || '').toLowerCase().includes(texto) ||
+    (obtenerNombreRol(u.rol) || '').toLowerCase().includes(texto);
+  
     const coincideRol = filtroRol === '' || String(u.rol) === filtroRol;
 
     return coincide && coincideRol;
@@ -143,17 +148,23 @@ export default function UsuariosPage() {
       <div className="encabezado">
         <h2>Usuarios Registrados</h2>
         <button className="btn-agregar" onClick={() => {
-          setFormulario({ id_usuario: '', usuario: '', nombre: '', apellido: '', pass: '', rol: '' });
+          setFormulario({
+            id_usuario: '',
+            usuario: '',
+            nombre: '',
+            apellidos: '',
+            contrasena: '',
+            rol: ''
+          });
           setModoEdicion(false);
           setMostrarFormulario(true);
         }}>+ Agregar Usuario</button>
       </div>
 
-      {/* Filtros */}
       <div className="filtros-usuarios" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
         <input
           type="text"
-          placeholder="Buscar por nombre, apellido, usuario o rol..."
+          placeholder="Buscar por nombre, apellidos, usuario o rol..."
           value={filtroTexto}
           onChange={(e) => setFiltroTexto(e.target.value)}
           className="input"
@@ -172,7 +183,7 @@ export default function UsuariosPage() {
           <tr>
             <th>#</th>
             <th>Nombre</th>
-            <th>Apellido</th>
+            <th>Apellidos</th>
             <th>Usuario</th>
             <th>Rol</th>
             <th>Acción</th>
@@ -183,7 +194,7 @@ export default function UsuariosPage() {
             <tr key={u.id_usuario}>
               <td>{idx + 1}</td>
               <td>{u.nombre}</td>
-              <td>{u.apellido}</td>
+              <td>{u.apellidos}</td>
               <td>{u.usuario}</td>
               <td>{obtenerNombreRol(u.rol)}</td>
               <td>
@@ -199,9 +210,9 @@ export default function UsuariosPage() {
         <form className="formulario-usuario" onSubmit={handleSubmit}>
           <h3>{modoEdicion ? 'Editar Usuario' : 'Registrar Usuario'}</h3>
           <input name="nombre" placeholder="Nombre" value={formulario.nombre} onChange={handleChange} required />
-          <input name="apellido" placeholder="Apellido" value={formulario.apellido} onChange={handleChange} required />
+          <input name="apellidos" placeholder="Apellidos" value={formulario.apellidos} onChange={handleChange} required />
           <input name="usuario" placeholder="Usuario" value={formulario.usuario} onChange={handleChange} required disabled={modoEdicion} />
-          <input type="password" name="pass" placeholder="Contraseña" value={formulario.pass} onChange={handleChange} required />
+          <input type="password" name="contrasena" placeholder="Contraseña" value={formulario.contrasena} onChange={handleChange} required />
           <select name="rol" value={formulario.rol} onChange={handleChange} required>
             <option value="">Seleccionar rol</option>
             <option value="0">Administrador</option>

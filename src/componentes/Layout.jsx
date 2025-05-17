@@ -9,8 +9,8 @@ export default function Layout() {
 
   const handleCerrarSesion = () => {
     if (confirm("¿Seguro que deseas cerrar sesión?")) {
-      localStorage.removeItem('usuario'); // 🧹 Borra sesión
-      navigate('/'); // 🚀 Regresa al login
+      localStorage.removeItem('usuario');
+      navigate('/');
     }
   };
 
@@ -23,35 +23,39 @@ export default function Layout() {
           <ul>
             <li><Link to="/dashboard">Dashboard</Link></li>
 
-            {(rol === 0 || rol === 1) && (
-              <li><Link to="/estudiantes">Estudiantes</Link></li>
-            )}
-
+            {/* ADMINISTRADOR: acceso total */}
             {rol === 0 && (
               <>
-                <li><Link to="/maestros">Maestros</Link></li>
+                <li><Link to="/estudiantes">Estudiantes</Link></li>
+                <li><Link to="/profesores">Profesores</Link></li>
                 <li><Link to="/padres">Padres</Link></li>
-                <li><Link to="/eventos">Eventos</Link></li>
-                <li><Link to="/examenes">Exámenes</Link></li>
                 <li><Link to="/usuarios">Usuarios</Link></li>
+                <li><Link to="/asignaciones">Asignaciones</Link></li>
+                <li><Link to="/horarios">Horarios</Link></li>
+                <li><Link to="/notas">Notas</Link></li>
               </>
             )}
 
-            {(rol === 1 || rol === 2) && (
-              <li><Link to="/horarios">Horarios</Link></li>
-            )}
-
+            {/* PROFESOR: acceso limitado */}
             {rol === 1 && (
-              <li><Link to="/notas">Notas</Link></li>
+              <>
+                <li><Link to="/estudiantes">Estudiantes</Link></li>
+                <li><Link to="/horarios">Horarios</Link></li>
+                <li><Link to="/notas">Notas</Link></li>
+              </>
             )}
 
+            {/* ESTUDIANTE: solo lo suyo */}
             {rol === 2 && (
-              <li><Link to="/mis-notas">Mis Notas</Link></li>
+              <>
+                <li><Link to="/horarios">Horarios</Link></li>
+                <li><Link to="/mis-notas">Mis Notas</Link></li>
+              </>
             )}
           </ul>
         </nav>
 
-        {/* ✅ Botón de Cerrar Sesión */}
+        {/* Botón de Cerrar Sesión */}
         <div className="cerrar-sesion-contenedor">
           <button className="btn-cerrar-sesion" onClick={handleCerrarSesion}>
             Cerrar Sesión
@@ -59,7 +63,7 @@ export default function Layout() {
         </div>
       </aside>
 
-      {/* Contenido de cada página */}
+      {/* Contenido principal */}
       <main className="main-content">
         <Outlet />
       </main>
