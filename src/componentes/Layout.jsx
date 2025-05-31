@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import '../estilos/layout.css';
+import '../estilos/Layout.css';
 
 export default function Layout() {
   const navigate = useNavigate();
