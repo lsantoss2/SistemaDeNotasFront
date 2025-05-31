@@ -14,15 +14,20 @@ export default function Layout() {
     }
   };
 
+  // Calculamos el color de fondo del sidebar según el rol
+  let colorSidebar = '';
+  if (rol === 0) colorSidebar = 'linear-gradient(to bottom, #1e3a8a, #3b82f6)'; // azul admin
+  else if (rol === 1) colorSidebar = 'linear-gradient(to bottom, #7f1d1d, #ef4444)'; // rojo profesor
+  else if (rol === 2) colorSidebar = 'linear-gradient(to bottom, #065f46, #10b981)'; // verde tutor
+
   return (
     <div className="layout-container">
       {/* Menú lateral */}
-      <aside className="sidebar">
+      <aside className="sidebar" style={{ background: colorSidebar }}>
         <div className="logo">Sistema</div>
         <nav>
           <ul>
-
-            {/* ADMINISTRADOR: acceso total */}
+            {/* ADMINISTRADOR */}
             {rol === 0 && (
               <>
                 <li><Link to="/dashboard">Dashboard</Link></li>
@@ -31,25 +36,22 @@ export default function Layout() {
                 <li><Link to="/padres">Padres</Link></li>
                 <li><Link to="/usuarios">Usuarios</Link></li>
                 <li><Link to="/asignaciones">Asignaciones</Link></li>
-                <li><Link to="/horarios">Horarios</Link></li>
                 <li><Link to="/notas">Notas</Link></li>
-                <li><Link to="/cursos">Cursos</Link></li> {/* ✅ Agregado */}
+                <li><Link to="/cursos">Cursos</Link></li>
               </>
             )}
 
-            {/* PROFESOR: acceso limitado */}
+            {/* PROFESOR */}
             {rol === 1 && (
               <>
                 <li><Link to="/estudiantes">Estudiantes</Link></li>
-                <li><Link to="/horarios">Horarios</Link></li>
                 <li><Link to="/notas">Notas</Link></li>
               </>
             )}
 
-            {/* ESTUDIANTE: solo lo suyo */}
+            {/* ESTUDIANTE */}
             {rol === 2 && (
               <>
-                <li><Link to="/horarios">Horarios</Link></li>
                 <li><Link to="/mis-notas">Mis Notas</Link></li>
               </>
             )}
