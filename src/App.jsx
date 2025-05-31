@@ -12,7 +12,8 @@ import TutoresPage from './paginas/TutoresPage';
 import AsignacionesPage from './paginas/AsignacionesPage';
 import NotasPage from './paginas/NotasPage';
 import HorariosPage from './paginas/HorariosPage';
-import MisNotasPage from './paginas/MisNotasPage'; // ✅ NUEVA IMPORTACIÓN
+import MisNotasPage from './paginas/MisNotasPage';
+import CursosPage from './paginas/CursosPage'; // ✅ Nueva importación
 
 export default function App() {
   return (
@@ -28,7 +29,8 @@ export default function App() {
         <Route path="asignaciones" element={<AsignacionesPage />} />
         <Route path="notas" element={<NotasPage />} />
         <Route path="horarios" element={<HorariosPage />} />
-        <Route path="mis-notas" element={<MisNotasPage />} /> {/* ✅ NUEVA RUTA */}
+        <Route path="mis-notas" element={<MisNotasPage />} />
+        <Route path="cursos" element={<CursosPage />} /> {/* ✅ Ruta agregada */}
       </Route>
     </Routes>
   );

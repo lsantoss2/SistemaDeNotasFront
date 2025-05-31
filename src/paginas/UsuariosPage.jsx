@@ -7,8 +7,8 @@ export default function UsuariosPage() {
     id_usuario: '',
     usuario: '',
     nombre: '',
-    apellidos: '',
-    contrasena: '',
+    apellido: '',
+    pass: '',
     rol: ''
   });
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -64,8 +64,8 @@ export default function UsuariosPage() {
           id_usuario: '',
           usuario: '',
           nombre: '',
-          apellidos: '',
-          contrasena: '',
+          apellido: '',
+          pass: '',
           rol: ''
         });
         setModoEdicion(false);
@@ -81,18 +81,46 @@ export default function UsuariosPage() {
     }
   };
 
-  const handleEditar = (user) => {
-    setFormulario({
-      id_usuario: user.id_usuario,
-      usuario: user.usuario,
-      nombre: user.nombre,
-      apellidos: user.apellido,
-      contrasena: user.contrasena,
-      rol: user.rol
-    });
-    setModoEdicion(true);
-    setUsuarioEditando(user.usuario);
-    setMostrarFormulario(true);
+  // 🔧 Elimina relación con Profesores si existe
+  const eliminarRelacionProfesor = async (id_usuario) => {
+    try {
+      const resProf = await fetch('http://www.bakend-notas.somee.com/Profesores/Buscar');
+      const dataProf = await resProf.json();
+      const prof = dataProf.find(p => p.id_usuario === id_usuario);
+
+      if (prof && prof.id_prof > 0) {
+        const resDel = await fetch(`http://www.bakend-notas.somee.com/Profesores/Eliminar?id_prof=${prof.id_prof}`, {
+          method: 'DELETE'
+        });
+        const texto = await resDel.text();
+        console.log("🧹 Profesor eliminado:", texto);
+      } else {
+        console.log("⚠️ No se encontró un profesor válido para eliminar.");
+      }
+    } catch (error) {
+      console.warn("⚠️ Error al eliminar relación profesor:", error);
+    }
+  };
+
+  // 🔧 Elimina relación con Tutor si existe
+  const eliminarRelacionTutor = async (id_usuario) => {
+    try {
+      const resTutor = await fetch('http://www.bakend-notas.somee.com/Tutor/Buscar');
+      const dataTutor = await resTutor.json();
+      const tutor = dataTutor.find(t => t.id_usuario === id_usuario);
+
+      if (tutor && tutor.id_tutor > 0) {
+        const resDel = await fetch(`http://www.bakend-notas.somee.com/Tutor/Eliminar?id_tutor=${tutor.id_tutor}`, {
+          method: 'DELETE'
+        });
+        const texto = await resDel.text();
+        console.log("🧹 Tutor eliminado:", texto);
+      } else {
+        console.log("⚠️ No se encontró un tutor válido para eliminar.");
+      }
+    } catch (error) {
+      console.warn("⚠️ Error al eliminar relación tutor:", error);
+    }
   };
 
   const handleEliminar = async (id_usuario) => {
@@ -104,6 +132,9 @@ export default function UsuariosPage() {
     if (!confirm(`¿Eliminar al usuario con ID ${id_usuario}?`)) return;
 
     try {
+      await eliminarRelacionProfesor(id_usuario);
+      await eliminarRelacionTutor(id_usuario);
+
       const res = await fetch(`http://www.bakend-notas.somee.com/Usuario/Eliminar?id_user=${id_usuario}`, {
         method: 'DELETE'
       });
@@ -121,11 +152,25 @@ export default function UsuariosPage() {
     }
   };
 
+  const handleEditar = (user) => {
+    setFormulario({
+      id_usuario: user.id_usuario,
+      usuario: user.usuario,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      pass: user.pass,
+      rol: user.rol
+    });
+    setModoEdicion(true);
+    setUsuarioEditando(user.usuario);
+    setMostrarFormulario(true);
+  };
+
   const obtenerNombreRol = (codigo) => {
     switch (codigo) {
       case 0: return "Administrador";
       case 1: return "Profesor";
-      case 2: return "Alumno";
+      case 2: return "Tutor";
       default: return "Desconocido";
     }
   };
@@ -133,11 +178,11 @@ export default function UsuariosPage() {
   const usuariosFiltrados = usuarios.filter((u) => {
     const texto = filtroTexto.toLowerCase();
     const coincide =
-    (u.nombre || '').toLowerCase().includes(texto) ||
-    (u.apellido || '').toLowerCase().includes(texto) ||
-    (u.usuario || '').toLowerCase().includes(texto) ||
-    (obtenerNombreRol(u.rol) || '').toLowerCase().includes(texto);
-  
+      (u.nombre || '').toLowerCase().includes(texto) ||
+      (u.apellido || '').toLowerCase().includes(texto) ||
+      (u.usuario || '').toLowerCase().includes(texto) ||
+      (obtenerNombreRol(u.rol) || '').toLowerCase().includes(texto);
+
     const coincideRol = filtroRol === '' || String(u.rol) === filtroRol;
 
     return coincide && coincideRol;
@@ -152,8 +197,8 @@ export default function UsuariosPage() {
             id_usuario: '',
             usuario: '',
             nombre: '',
-            apellidos: '',
-            contrasena: '',
+            apellido: '',
+            pass: '',
             rol: ''
           });
           setModoEdicion(false);
@@ -174,7 +219,7 @@ export default function UsuariosPage() {
           <option value="">Todos los roles</option>
           <option value="0">Administrador</option>
           <option value="1">Profesor</option>
-          <option value="2">Alumno</option>
+          <option value="2">Tutor</option>
         </select>
       </div>
 
@@ -183,7 +228,7 @@ export default function UsuariosPage() {
           <tr>
             <th>#</th>
             <th>Nombre</th>
-            <th>apellido</th>
+            <th>Apellido</th>
             <th>Usuario</th>
             <th>Rol</th>
             <th>Acción</th>
@@ -207,23 +252,26 @@ export default function UsuariosPage() {
       </table>
 
       {mostrarFormulario && (
-        <form className="formulario-usuario" onSubmit={handleSubmit}>
-          <h3>{modoEdicion ? 'Editar Usuario' : 'Registrar Usuario'}</h3>
-          <input name="nombre" placeholder="Nombre" value={formulario.nombre} onChange={handleChange} required />
-          <input name="apellido" placeholder="apellido" value={formulario.apellido} onChange={handleChange} required />
-          <input name="usuario" placeholder="Usuario" value={formulario.usuario} onChange={handleChange} required disabled={modoEdicion} />
-          <input type="password" name="contrasena" placeholder="Contraseña" value={formulario.contrasena} onChange={handleChange} required />
-          <select name="rol" value={formulario.rol} onChange={handleChange} required>
-            <option value="">Seleccionar rol</option>
-            <option value="0">Administrador</option>
-            <option value="1">Profesor</option>
-            <option value="2">Alumno</option>
-          </select>
-          <div className="acciones-form">
-            <button type="submit">{modoEdicion ? 'Guardar Cambios' : 'Registrar'}</button>
-            <button type="button" className="cancelar" onClick={() => setMostrarFormulario(false)}>Cancelar</button>
-          </div>
-        </form>
+        <>
+          <div className="fondo-modal" onClick={() => setMostrarFormulario(false)}></div>
+          <form className="formulario-usuario" onSubmit={handleSubmit}>
+            <h3>{modoEdicion ? 'Editar Usuario' : 'Registrar Usuario'}</h3>
+            <input name="nombre" placeholder="Nombre" value={formulario.nombre} onChange={handleChange} required />
+            <input name="apellido" placeholder="Apellido" value={formulario.apellido} onChange={handleChange} required />
+            <input name="usuario" placeholder="Usuario" value={formulario.usuario} onChange={handleChange} required disabled={modoEdicion} />
+            <input type="password" name="pass" placeholder="Contraseña" value={formulario.pass} onChange={handleChange} required />
+            <select name="rol" value={formulario.rol} onChange={handleChange} required>
+              <option value="">Seleccionar rol</option>
+              <option value="0">Administrador</option>
+              <option value="1">Profesor</option>
+              <option value="2">Tutor</option>
+            </select>
+            <div className="acciones-form">
+              <button type="submit">{modoEdicion ? 'Guardar Cambios' : 'Registrar'}</button>
+              <button type="button" className="cancelar" onClick={() => setMostrarFormulario(false)}>Cancelar</button>
+            </div>
+          </form>
+        </>
       )}
     </div>
   );

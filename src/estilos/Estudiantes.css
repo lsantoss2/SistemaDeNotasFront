@@ -1,74 +1,163 @@
+/* General */
+body {
+  background-color: #f5f8fd;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Contenedor principal */
 .contenedor-estudiantes {
   padding: 2rem;
-  background-color: #f7f9fc;
-  border-radius: 10px;
 }
 
-.contenedor-estudiantes h2 {
+/* Encabezado */
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.encabezado h2 {
+  font-size: 24px;
+  color: #1e1e2d;
+}
+
+/* Botón agregar */
+.btn-agregar {
+  padding: 0.5rem 1.2rem;
+  font-size: 15px;
+  background-color: #28a745;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-agregar:hover {
+  background-color: #218838;
+}
+
+/* Input de búsqueda */
+.input {
+  padding: 0.55rem;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
   margin-bottom: 1rem;
-  color: #1a237e;
 }
 
-table {
+/* Tabla */
+.tabla-estudiantes {
   width: 100%;
   border-collapse: collapse;
-  background: white;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  border-radius: 10px;
+  background-color: #fff;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-table th, table td {
-  padding: 12px 15px;
+.tabla-estudiantes thead {
+  background-color: #e9ecef;
+}
+
+.tabla-estudiantes th,
+.tabla-estudiantes td {
+  padding: 0.85rem 1rem;
   text-align: left;
-}
-
-table th {
-  background-color: #e8eaf6;
-  color: #1a237e;
-}
-
-table tbody tr:nth-child(even) {
-  background-color: #f4f6f8;
-}
-
-table tbody tr:hover {
-  background-color: #e3f2fd;
-}
-
-img {
-  border-radius: 50%;
-}
-
-button {
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
   font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #dee2e6;
 }
 
-button:hover {
-  background-color: #0d47a1;
+.tabla-estudiantes tr:hover {
+  background-color: #f1f1f1;
 }
 
-.resumen {
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: #ffffff;
-  border: 1px solid #cfd8dc;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+/* Botones de acción */
+.btn-accion {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.resumen h3 {
-  color: #0d47a1;
-  margin-bottom: 10px;
+.btn-accion:hover {
+  transform: scale(1.2);
+  color: #007bff;
 }
 
-.resumen p {
-  margin: 4px 0;
+/* Fondo oscuro para modal */
+.fondo-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 998;
+  backdrop-filter: none !important;
+}
+
+/* Modal formulario de Estudiantes */
+.formulario-estudiante {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  max-width: 500px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  z-index: 999;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: none !important;
+}
+
+.formulario-estudiante h3 {
+  margin-bottom: 1rem;
+  color: #1e1e2d;
+}
+
+/* Inputs y selects */
+.formulario-estudiante input,
+.formulario-estudiante select {
+  width: 100%;
+  padding: 0.6rem;
   font-size: 15px;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* Acciones del formulario */
+.acciones-form {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.acciones-form button {
+  flex: 1;
+  padding: 0.6rem;
+  font-weight: bold;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.acciones-form button[type='submit'] {
+  background-color: #007bff;
+  color: white;
+}
+
+.acciones-form button.cancelar {
+  background-color: #6c757d;
+  color: white;
 }

@@ -33,6 +33,7 @@ export default function Layout() {
                 <li><Link to="/asignaciones">Asignaciones</Link></li>
                 <li><Link to="/horarios">Horarios</Link></li>
                 <li><Link to="/notas">Notas</Link></li>
+                <li><Link to="/cursos">Cursos</Link></li> {/* ✅ Agregado */}
               </>
             )}
 

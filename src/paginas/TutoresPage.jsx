@@ -10,7 +10,6 @@ export default function TutoresPage() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [formulario, setFormulario] = useState({
-    id: '',
     dpi: '',
     id_usuario: ''
   });
@@ -63,36 +62,33 @@ export default function TutoresPage() {
     e.preventDefault();
 
     const query = new URLSearchParams({
-      id: formulario.id,
       DPI: formulario.dpi,
       id_usuario: formulario.id_usuario
     });
 
     try {
-      const res = await fetch(`http://www.bakend-notas.somee.com/Tutor/Modificar?${query.toString()}`, {
-        method: 'PUT'
+      const res = await fetch(`http://www.bakend-notas.somee.com/Tutor/Ingresar?${query.toString()}`, {
+        method: 'POST'
       });
 
       const texto = await res.text();
 
       if (res.ok) {
-        alert('✅ Tutor modificado');
-        setFormulario({ id: '', dpi: '', id_usuario: '' });
-        setModoEdicion(false);
+        alert('✅ Tutor registrado');
+        setFormulario({ dpi: '', id_usuario: '' });
         setMostrarFormulario(false);
         obtenerTutores();
       } else {
         alert('❌ Error:\n' + texto);
       }
     } catch (error) {
-      alert('❌ Error al modificar tutor');
+      alert('❌ Error al registrar tutor');
       console.error(error);
     }
   };
 
   const handleEditar = (tutor) => {
     setFormulario({
-      id: tutor.id,
       dpi: tutor.dpi,
       id_usuario: tutor.id_usuario
     });
@@ -127,7 +123,6 @@ export default function TutoresPage() {
     return (
       tutor.dpi.toLowerCase().includes(texto) ||
       tutor.id_usuario.toString().includes(texto) ||
-      tutor.id.toString().includes(texto) ||
       (tutor.nombre && tutor.nombre.toLowerCase().includes(texto)) ||
       (tutor.apellido && tutor.apellido.toLowerCase().includes(texto)) ||
       (tutor.usuario && tutor.usuario.toLowerCase().includes(texto))
@@ -143,6 +138,9 @@ export default function TutoresPage() {
     }
   };
 
+  // IDs de usuarios que ya son tutores
+  const usuariosAsignadosIds = tutores.map(t => t.id_usuario);
+
   if (loading) {
     return <div className="contenedor-estudiantes">Cargando datos...</div>;
   }
@@ -152,7 +150,7 @@ export default function TutoresPage() {
       <div className="encabezado">
         <h2>Tutores Registrados</h2>
         <button className="btn-agregar" onClick={() => {
-          setFormulario({ id: '', dpi: '', id_usuario: '' });
+          setFormulario({ dpi: '', id_usuario: '' });
           setModoEdicion(false);
           setMostrarFormulario(true);
         }}>+ Agregar Tutor</button>
@@ -161,7 +159,7 @@ export default function TutoresPage() {
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
         <input
           type="text"
-          placeholder="Buscar por ID, DPI, ID Usuario, nombre, apellido o usuario..."
+          placeholder="Buscar por DPI, ID Usuario, nombre, apellido o usuario..."
           className="input"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
@@ -206,12 +204,38 @@ export default function TutoresPage() {
       {mostrarFormulario && (
         <form className="formulario-estudiante" onSubmit={handleSubmit}>
           <h3>{modoEdicion ? 'Editar Tutor' : 'Registrar Tutor'}</h3>
-          <input name="id" placeholder="ID Tutor" value={formulario.id} onChange={handleChange} required />
-          <input name="dpi" placeholder="DPI" value={formulario.dpi} onChange={handleChange} required />
-          <input name="id_usuario" placeholder="ID Usuario" value={formulario.id_usuario} onChange={handleChange} required />
+          <input 
+            name="dpi" 
+            placeholder="DPI" 
+            value={formulario.dpi} 
+            onChange={handleChange} 
+            required 
+          />
+          <select 
+            name="id_usuario" 
+            value={formulario.id_usuario} 
+            onChange={handleChange} 
+            required
+          >
+            <option value="">Seleccione un usuario</option>
+            {usuarios
+              .filter(u => u.rol === 2 && !usuariosAsignadosIds.includes(u.id_usuario))
+              .map(u => (
+                <option key={u.id_usuario} value={u.id_usuario}>
+                  {u.nombre} {u.apellido}
+                </option>
+              ))
+            }
+          </select>
           <div className="acciones-form">
             <button type="submit">{modoEdicion ? 'Guardar Cambios' : 'Registrar'}</button>
-            <button type="button" className="cancelar" onClick={() => setMostrarFormulario(false)}>Cancelar</button>
+            <button 
+              type="button" 
+              className="cancelar" 
+              onClick={() => setMostrarFormulario(false)}
+            >
+              Cancelar
+            </button>
           </div>
         </form>
       )}

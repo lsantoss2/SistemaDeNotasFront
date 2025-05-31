@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import '../estilos/Profesores.css';
 
 export default function ProfesoresPage() {
   const [profesores, setProfesores] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
+  const [cursos, setCursos] = useState([]);
   const [combinedData, setCombinedData] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -11,7 +13,10 @@ export default function ProfesoresPage() {
     id_prof: '',
     dpi: '',
     fecha: '',
-    id_usuario: ''
+    id_usuario: '',
+    nombre: '',
+    apellido: '',
+    usuario: ''
   });
 
   useEffect(() => {
@@ -20,25 +25,30 @@ export default function ProfesoresPage() {
 
   const obtenerDatos = async () => {
     try {
-      const [profRes, userRes] = await Promise.all([
+      const [profRes, userRes, cursosRes] = await Promise.all([
         fetch('http://www.bakend-notas.somee.com/Profesores/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Usuario/Buscar')
+        fetch('http://www.bakend-notas.somee.com/Usuario/Buscar'),
+        fetch('http://www.bakend-notas.somee.com/Curso/Buscar')
       ]);
 
       const profesoresData = await profRes.json();
       const usuariosData = await userRes.json();
+      const cursosData = await cursosRes.json();
 
       setProfesores(profesoresData);
       setUsuarios(usuariosData);
+      setCursos(cursosData);
 
       const combinados = profesoresData.map(prof => {
         const user = usuariosData.find(u => u.id_usuario === prof.id_usuario) || {};
+        const curso = cursosData.find(c => c.id_profesor === prof.id_prof) || {};
+
         return {
           ...prof,
           usuario: user.usuario || 'N/A',
           nombre: user.nombre || 'N/A',
           apellido: user.apellido || 'N/A',
-          rol: user.rol ?? 'N/A'
+          materia: curso.nombre || 'No asignado'
         };
       });
 
@@ -72,7 +82,7 @@ export default function ProfesoresPage() {
 
       if (res.ok) {
         alert("✅ Profesor registrado correctamente");
-        setFormulario({ id_prof: '', dpi: '', fecha: '', id_usuario: '' });
+        setFormulario({ id_prof: '', dpi: '', fecha: '', id_usuario: '', nombre: '', apellido: '', usuario: '' });
         setMostrarFormulario(false);
         obtenerDatos();
       } else {
@@ -89,7 +99,10 @@ export default function ProfesoresPage() {
       id_prof: prof.id_prof,
       dpi: prof.dpi,
       fecha: prof.fecha,
-      id_usuario: prof.id_usuario
+      id_usuario: prof.id_usuario,
+      nombre: prof.nombre,
+      apellido: prof.apellido,
+      usuario: prof.usuario
     });
     setModoEdicion(true);
     setMostrarFormulario(true);
@@ -114,7 +127,7 @@ export default function ProfesoresPage() {
 
       if (res.ok) {
         alert("✅ Profesor modificado");
-        setFormulario({ id_prof: '', dpi: '', fecha: '', id_usuario: '' });
+        setFormulario({ id_prof: '', dpi: '', fecha: '', id_usuario: '', nombre: '', apellido: '', usuario: '' });
         setModoEdicion(false);
         setMostrarFormulario(false);
         obtenerDatos();
@@ -156,38 +169,39 @@ export default function ProfesoresPage() {
       p.usuario?.toLowerCase().includes(texto) ||
       p.nombre?.toLowerCase().includes(texto) ||
       p.apellido?.toLowerCase().includes(texto) ||
-      String(p.id_usuario).includes(texto)
+      p.materia?.toLowerCase().includes(texto)
     );
   });
 
-  const obtenerNombreRol = (rol) => {
-    switch (rol) {
-      case 0: return "Administrador";
-      case 1: return "Profesor";
-      case 2: return "Tutor";
-      default: return "Desconocido";
+  // Filtrar usuarios con rol 1 y que NO estén ya asignados como profesores (excepto el que se edita)
+  const usuariosDisponibles = usuarios.filter(u => {
+    const esProfesor = profesores.some(p => p.id_usuario === u.id_usuario);
+    if (modoEdicion && parseInt(formulario.id_usuario) === u.id_usuario) {
+      return true; // Asegurar que el usuario actual se muestre en edición
     }
-  };
+    return u.rol === 1 && !esProfesor;
+  });
 
   return (
-    <div className="contenedor">
-      <h2>Profesores Registrados</h2>
-
-      <button onClick={() => {
-        setFormulario({ id_prof: '', dpi: '', fecha: '', id_usuario: '' });
-        setModoEdicion(false);
-        setMostrarFormulario(true);
-      }}>+ Agregar Profesor</button>
+    <div className="contenedor-profesores">
+      <div className="encabezado">
+        <h2>Profesores Registrados</h2>
+        <button className="btn-agregar" onClick={() => {
+          setFormulario({ id_prof: '', dpi: '', fecha: '', id_usuario: '', nombre: '', apellido: '', usuario: '' });
+          setModoEdicion(false);
+          setMostrarFormulario(true);
+        }}>+ Agregar Profesor</button>
+      </div>
 
       <input
         type="text"
         placeholder="Buscar..."
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
-        style={{ margin: '10px 0', width: '100%' }}
+        className="input"
       />
 
-      <table>
+      <table className="tabla-profesores">
         <thead>
           <tr>
             <th>ID</th>
@@ -196,8 +210,7 @@ export default function ProfesoresPage() {
             <th>Usuario</th>
             <th>DPI</th>
             <th>Fecha Contratación</th>
-            <th>ID Usuario</th>
-            <th>Rol</th>
+            <th>Materia</th>
             <th>Acción</th>
           </tr>
         </thead>
@@ -210,11 +223,10 @@ export default function ProfesoresPage() {
               <td>{p.usuario}</td>
               <td>{p.dpi}</td>
               <td>{p.fecha}</td>
-              <td>{p.id_usuario}</td>
-              <td>{obtenerNombreRol(p.rol)}</td>
+              <td>{p.materia}</td>
               <td>
-                <button onClick={() => handleEditar(p)}>✏️</button>
-                <button onClick={() => handleEliminar(p.id_prof)}>🗑️</button>
+                <button className="btn-accion" onClick={() => handleEditar(p)}>✏️</button>
+                <button className="btn-accion" onClick={() => handleEliminar(p.id_prof)}>🗑️</button>
               </td>
             </tr>
           ))}
@@ -222,17 +234,53 @@ export default function ProfesoresPage() {
       </table>
 
       {mostrarFormulario && (
-        <form onSubmit={modoEdicion ? handleModificar : handleRegistrar} style={{ marginTop: '2rem' }}>
-          <h3>{modoEdicion ? 'Editar Profesor' : 'Registrar Profesor'}</h3>
-          {modoEdicion && <input name="id_prof" placeholder="ID" value={formulario.id_prof} onChange={handleChange} required readOnly />}
-          <input name="dpi" placeholder="DPI" value={formulario.dpi} onChange={handleChange} required />
-          <input type="date" name="fecha" placeholder="Fecha de Contratación" value={formulario.fecha} onChange={handleChange} required />
-          <input name="id_usuario" placeholder="ID Usuario" type="number" value={formulario.id_usuario} onChange={handleChange} required />
-          <div style={{ marginTop: '10px' }}>
-            <button type="submit">{modoEdicion ? 'Guardar Cambios' : 'Registrar'}</button>
-            <button type="button" onClick={() => setMostrarFormulario(false)} style={{ marginLeft: '10px' }}>Cancelar</button>
-          </div>
-        </form>
+        <>
+          <div className="fondo-modal" onClick={() => setMostrarFormulario(false)}></div>
+
+          <form
+            className="formulario-profesor"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={modoEdicion ? handleModificar : handleRegistrar}
+          >
+            <h3>{modoEdicion ? 'Editar Profesor' : 'Registrar Profesor'}</h3>
+            {modoEdicion && (
+              <input
+                name="id_prof"
+                placeholder="ID"
+                value={formulario.id_prof}
+                onChange={handleChange}
+                readOnly
+              />
+            )}
+            <input name="dpi" placeholder="DPI" value={formulario.dpi} onChange={handleChange} required />
+            <input type="date" name="fecha" value={formulario.fecha} onChange={handleChange} required />
+
+            <select
+              name="id_usuario"
+              value={formulario.id_usuario}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Seleccionar usuario</option>
+              {/* Mostrar el usuario actual en edición si no está en la lista */}
+              {modoEdicion && !usuariosDisponibles.some(u => u.id_usuario === parseInt(formulario.id_usuario)) && (
+                <option value={formulario.id_usuario}>
+                  {formulario.nombre} {formulario.apellido} ({formulario.usuario})
+                </option>
+              )}
+              {usuariosDisponibles.map(u => (
+                <option key={u.id_usuario} value={u.id_usuario}>
+                  {u.nombre} {u.apellido} ({u.usuario})
+                </option>
+              ))}
+            </select>
+
+            <div className="acciones-form">
+              <button type="submit">{modoEdicion ? 'Guardar Cambios' : 'Registrar'}</button>
+              <button type="button" className="cancelar" onClick={() => setMostrarFormulario(false)}>Cancelar</button>
+            </div>
+          </form>
+        </>
       )}
     </div>
   );

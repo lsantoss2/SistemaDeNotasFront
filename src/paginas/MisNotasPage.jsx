@@ -4,6 +4,7 @@ import autoTable from 'jspdf-autotable';
 
 export default function MisNotasPage() {
   const [notasPorEstudiante, setNotasPorEstudiante] = useState([]);
+  const [cursos, setCursos] = useState([]);
   const [estudiantesSeleccionados, setEstudiantesSeleccionados] = useState([]);
 
   useEffect(() => {
@@ -34,13 +35,9 @@ export default function MisNotasPage() {
         est.tutores.some(t => t.id_tutor === tutor.id)
       );
 
-      if (estudiantesAsociados.length === 0) {
-        alert("No hay estudiantes asignados a este tutor.");
-        return;
-      }
-
       const resCursos = await fetch('http://www.bakend-notas.somee.com/Curso/Buscar');
       const cursosData = await resCursos.json();
+      setCursos(cursosData);
 
       const resNotas = await fetch('http://www.bakend-notas.somee.com/Notas/Buscar');
       const todasNotas = await resNotas.json();
@@ -51,13 +48,15 @@ export default function MisNotasPage() {
           const curso = cursosData.find(c => c.id_curso === nota.id_curso);
           return {
             ...nota,
-            nombreCurso: curso?.nombre || 'Sin curso'
+            nombreCurso: curso?.nombre || 'Sin curso',
+            id_grado: curso?.id_grado || 0
           };
         });
 
         return {
           estudiante: est,
-          notas: notasConCurso
+          notas: notasConCurso,
+          id_grado: notasConCurso.length > 0 ? notasConCurso[0].id_grado : 0
         };
       });
 
@@ -93,91 +92,131 @@ export default function MisNotasPage() {
       return;
     }
 
-    seleccionados.forEach(({ estudiante, notas }) => {
+    seleccionados.forEach(({ estudiante, notas, id_grado }) => {
       doc.setFontSize(12);
       doc.setTextColor(33, 37, 41);
       doc.text(`${estudiante.nombre}`, 14, y);
       y += 6;
 
-      if (notas.length === 0) {
-        doc.text('Este estudiante no tiene notas registradas.', 14, y);
-        y += 10;
-      } else {
-        const columnas = ["Curso", "Unidad", "Punteo"];
-        const filas = notas.map(n => [n.nombreCurso, n.unidad, n.nota]);
+      const cursosFiltrados = cursos.filter(c => c.id_grado === id_grado);
+      const filas = cursosFiltrados.map(curso => {
+        const notasCurso = notas.filter(n => n.id_curso === curso.id_curso);
+        const porUnidad = {};
+        for (let i = 1; i <= 4; i++) {
+          const notaUnidad = notasCurso.find(n => n.unidad === i);
+          porUnidad[i] = notaUnidad ? notaUnidad.nota : '—';
+        }
+        const promedio = calcularPromedio(porUnidad);
+        return [
+          curso.nombre,
+          ...[1, 2, 3, 4].map(u => porUnidad[u]),
+          promedio
+        ];
+      });
 
-        autoTable(doc, {
-          head: [columnas],
-          body: filas,
-          startY: y,
-          margin: { left: 14, right: 14 },
-          styles: { fontSize: 10 },
-          theme: 'grid',
-        });
+      autoTable(doc, {
+        head: [['Curso', 'Unidad 1', 'Unidad 2', 'Unidad 3', 'Unidad 4', 'Promedio']],
+        body: filas,
+        startY: y,
+        margin: { left: 14, right: 14 },
+        styles: { fontSize: 10 },
+        theme: 'grid',
+      });
 
-        y = doc.lastAutoTable.finalY + 10;
-      }
+      y = doc.lastAutoTable.finalY + 10;
     });
 
     doc.save('ReporteNotas.pdf');
   };
 
-  return (
-    <div style={{ padding: '2rem' }}>
-      <h2>📘 Mis Notas</h2>
+  const calcularPromedio = (notasPorUnidad) => {
+    let suma = 0;
+    let cantidad = 0;
+    Object.values(notasPorUnidad).forEach(n => {
+      if (n !== '—') {
+        suma += parseFloat(n);
+        cantidad++;
+      }
+    });
+    return cantidad > 0 ? (suma / cantidad).toFixed(2) : '—';
+  };
 
-      <button
-        onClick={exportarPDF}
-        style={{
-          marginBottom: '20px',
-          padding: '10px 20px',
-          backgroundColor: '#007bff',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '5px'
-        }}
-      >
+  return (
+    <div className="contenedor">
+      <h2>📘 Mis Notas</h2>
+      <button onClick={exportarPDF} className="btn btn-primary" style={{ marginBottom: '20px' }}>
         📄 Exportar PDF
       </button>
 
       {notasPorEstudiante.length === 0 ? (
         <p>No hay notas disponibles.</p>
       ) : (
-        notasPorEstudiante.map(({ estudiante, notas }) => (
-          <div key={estudiante.id_estudiante} style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <input
-                type="checkbox"
-                checked={estudiantesSeleccionados.includes(estudiante.id_estudiante)}
-                onChange={() => toggleSeleccion(estudiante.id_estudiante)}
-              />
-              <h3 style={{ color: '#003366', margin: 0 }}>👨‍🎓 {estudiante.nombre}</h3>
-            </label>
+        notasPorEstudiante.map(({ estudiante, notas, id_grado }) => {
+          const cursosFiltrados = cursos.filter(c => c.id_grado === id_grado);
+          const notasAgrupadas = cursosFiltrados.map(curso => {
+            const notasCurso = notas.filter(n => n.id_curso === curso.id_curso);
+            const porUnidad = {};
+            for (let i = 1; i <= 4; i++) {
+              const notaUnidad = notasCurso.find(n => n.unidad === i);
+              porUnidad[i] = notaUnidad ? notaUnidad.nota : '—';
+            }
+            const promedio = calcularPromedio(porUnidad);
+            return { nombreCurso: curso.nombre, notasPorUnidad: porUnidad, promedio };
+          });
 
-            {notas.length === 0 ? (
-              <p>Este estudiante no tiene notas registradas.</p>
-            ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+          return (
+            <div key={estudiante.id_estudiante} style={{ marginBottom: '2rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input
+                  type="checkbox"
+                  checked={estudiantesSeleccionados.includes(estudiante.id_estudiante)}
+                  onChange={() => toggleSeleccion(estudiante.id_estudiante)}
+                />
+                <h3 style={{ margin: 0 }}>Notas de {estudiante.nombre} {estudiante.apellido}</h3>
+              </label>
+              <table className="table">
                 <thead>
-                  <tr style={{ backgroundColor: '#f0f0f0' }}>
-                    <th style={{ padding: '8px', border: '1px solid #ccc' }}>Curso</th>
-                    <th style={{ padding: '8px', border: '1px solid #ccc' }}>Unidad</th>
-                    <th style={{ padding: '8px', border: '1px solid #ccc' }}>Punteo</th>
+                  <tr>
+                    <th>Curso</th>
+                    <th>Unidad 1</th>
+                    <th>Unidad 2</th>
+                    <th>Unidad 3</th>
+                    <th>Unidad 4</th>
+                    <th>Promedio</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {notas.map(nota => (
-                    <tr key={nota.id_nota}>
-                      <td style={{ padding: '8px', border: '1px solid #ccc' }}>{nota.nombreCurso}</td>
-                      <td style={{ padding: '8px', border: '1px solid #ccc' }}>{nota.unidad}</td>
-                      <td style={{ padding: '8px', border: '1px solid #ccc' }}>{nota.nota}</td>
+                  {notasAgrupadas.map((curso, idx) => (
+                    <tr key={idx}>
+                      <td>{curso.nombreCurso}</td>
+                      {[1, 2, 3, 4].map(unidad => {
+                        const nota = curso.notasPorUnidad[unidad];
+                        const esNotaBaja = nota !== '—' && parseFloat(nota) < 60;
+                        return (
+                          <td
+                            key={unidad}
+                            style={{
+                              color: esNotaBaja ? 'red' : 'inherit'
+                            }}
+                          >
+                            {nota}
+                          </td>
+                        );
+                      })}
+                      <td
+                        style={{
+                          color: curso.promedio !== '—' && parseFloat(curso.promedio) < 60 ? 'red' : 'inherit'
+                        }}
+                      >
+                        {curso.promedio}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            )}
-          </div>
-        ))
+            </div>
+          );
+        })
       )}
     </div>
   );
