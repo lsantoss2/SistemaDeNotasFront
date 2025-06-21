@@ -1,11 +1,16 @@
+/* === CONTENEDOR PRINCIPAL === */
 .contenedor {
   padding: 2rem;
+  background-color: #f9f9f9;
+  font-family: 'Segoe UI', sans-serif;
 }
 
+/* === TABLA PRINCIPAL === */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
+  background-color: white;
 }
 
 table, th, td {
@@ -15,8 +20,10 @@ table, th, td {
 th, td {
   padding: 0.5rem;
   text-align: center;
+  font-size: 14px;
 }
 
+/* === BOTONES === */
 button {
   background-color: #007bff;
   color: white;
@@ -24,12 +31,14 @@ button {
   border-radius: 4px;
   padding: 0.3rem 0.6rem;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 button:hover {
   background-color: #0056b3;
 }
 
+/* === MODAL === */
 .modal {
   position: fixed;
   top: 0;
@@ -41,18 +50,22 @@ button:hover {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .modal-contenido {
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  width: 80%;
+  width: 100%;
   max-width: 800px;
   max-height: 90%;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
+/* === TABLA DENTRO DEL MODAL === */
 .tabla-notas-modal {
   width: 100%;
   border-collapse: collapse;
@@ -62,17 +75,16 @@ button:hover {
 .tabla-notas-modal th, .tabla-notas-modal td {
   border: 1px solid #ddd;
   padding: 0.5rem;
+  text-align: center;
+  font-size: 14px;
 }
 
 .tabla-notas-modal th {
   background-color: #f5f5f5;
+  font-weight: bold;
 }
 
-.acciones-modal {
-  text-align: right;
-  margin-top: 1rem;
-}
-
+/* === BOTONES DENTRO DEL MODAL === */
 .tabla-notas-modal button {
   background-color: #007bff;
   border: none;
@@ -87,14 +99,62 @@ button:hover {
   background-color: #0056b3;
 }
 
-.tabla-notas-modal td {
-  padding: 0.5rem;
-  text-align: center;
-  transition: background-color 0.2s;
-}
 .tabla-notas-modal td:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
+
 .tabla-notas-modal td[style*="cursor: pointer"] {
   cursor: pointer;
+}
+
+/* === ACCIONES DEL MODAL === */
+.acciones-modal {
+  text-align: right;
+  margin-top: 1rem;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .contenedor {
+    padding: 1rem;
+  }
+
+  th, td,
+  .tabla-notas-modal th,
+  .tabla-notas-modal td {
+    font-size: 13px;
+    padding: 0.4rem;
+  }
+
+  .modal-contenido {
+    padding: 1rem;
+  }
+
+  button,
+  .tabla-notas-modal button {
+    font-size: 13px;
+    padding: 0.3rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabla-notas-modal,
+  table {
+    font-size: 12px;
+  }
+
+  th, td,
+  .tabla-notas-modal th,
+  .tabla-notas-modal td {
+    padding: 0.3rem;
+  }
+
+  .modal-contenido {
+    padding: 0.8rem;
+  }
+
+  .tabla-notas-modal button {
+    padding: 0.25rem 0.5rem;
+    font-size: 12px;
+  }
 }

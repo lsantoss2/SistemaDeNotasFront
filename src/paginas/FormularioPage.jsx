@@ -16,7 +16,7 @@ export default function FormularioPage() {
     }
 
     if (id) {
-      fetch(`http://www.bakend-notas.somee.com/${capitalizar(tipo)}/Buscar?id_${tipo}=${id}`)
+      fetch(`https://proxy-somee.onrender.com/api/${capitalizar(tipo)}/Buscar?id_${tipo}=${id}`)
         .then(res => res.json())
         .then(data => {
           const datos = Array.isArray(data) ? data[0] : data;
@@ -50,8 +50,8 @@ export default function FormularioPage() {
   const obtenerTutores = async () => {
     try {
       const [resTutores, resUsuarios] = await Promise.all([
-        fetch('http://www.bakend-notas.somee.com/Tutor/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Usuario/Buscar')
+        fetch('https://proxy-somee.onrender.com/api/Tutor/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Usuario/Buscar')
       ]);
       const dataTutores = await resTutores.json();
       const dataUsuarios = await resUsuarios.json();
@@ -95,7 +95,7 @@ export default function FormularioPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const urlBase = `http://www.bakend-notas.somee.com/${capitalizar(tipo)}`;
+    const urlBase = `https://proxy-somee.onrender.com/api/${capitalizar(tipo)}`;
     const endpoint = id ? `/Modificar` : '/Ingresar';
     const metodo = id ? 'PUT' : 'POST';
 

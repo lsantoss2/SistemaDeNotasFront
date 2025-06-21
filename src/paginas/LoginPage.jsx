@@ -28,7 +28,7 @@ export default function LoginPage() {
     // Validar si es tutor (rol 2)
     if (resultado.rol === 2) {
       try {
-        const resTutor = await fetch(`http://www.bakend-notas.somee.com/Tutor/Buscar`);
+        const resTutor = await fetch(`https://proxy-somee.onrender.com/api/Tutor/Buscar`);
         const tutores = await resTutor.json();
         const tutor = tutores.find(t => t.id_usuario === idUsuario);
 
@@ -40,7 +40,7 @@ export default function LoginPage() {
         console.log('📘 Tutor encontrado:', tutor);
 
         // Obtener lista de estudiantes
-        const resEstudiantes = await fetch(`http://www.bakend-notas.somee.com/Estudiante/Buscar`);
+        const resEstudiantes = await fetch(`https://proxy-somee.onrender.com/api/Estudiante/Buscar`);
         const listaEstudiantes = await resEstudiantes.json();
         console.log('📚 Estudiantes recibidos:', listaEstudiantes);
 

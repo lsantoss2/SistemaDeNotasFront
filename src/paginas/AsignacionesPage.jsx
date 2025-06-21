@@ -27,10 +27,10 @@ export default function AsignacionesPage() {
   const obtenerDatos = async () => {
     try {
       const [resEstudiantes, resAsignaciones, resGrados, resCiclos] = await Promise.all([
-        fetch('http://www.bakend-notas.somee.com/Estudiante/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Estudiante/Asignacion/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Grado/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Ciclo/Buscar')
+        fetch('https://proxy-somee.onrender.com/api/Estudiante/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Estudiante/Asignacion/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Grado/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Ciclo/Buscar')
       ]);
 
       const dataEstudiantes = await resEstudiantes.json();
@@ -93,8 +93,8 @@ export default function AsignacionesPage() {
     e.preventDefault();
 
     const url = modoEdicion
-      ? 'http://www.bakend-notas.somee.com/Estudiante/Asignacion/Modificar'
-      : 'http://www.bakend-notas.somee.com/Estudiante/Asignacion/Ingresar';
+      ? 'https://proxy-somee.onrender.com/api/Estudiante/Asignacion/Modificar'
+      : 'https://proxy-somee.onrender.com/api/Estudiante/Asignacion/Ingresar';
 
     const payload = modoEdicion
       ? { id_estudiante_grado: idEditando, ...formulario }

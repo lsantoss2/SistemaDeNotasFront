@@ -22,8 +22,8 @@ export default function TutoresPage() {
     try {
       setLoading(true);
       const [tutoresRes, usuariosRes] = await Promise.all([
-        fetch('http://www.bakend-notas.somee.com/Tutor/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Usuario/Buscar')
+        fetch('https://proxy-somee.onrender.com/api/Tutor/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Usuario/Buscar')
       ]);
 
       const tutoresData = await tutoresRes.json();
@@ -67,7 +67,7 @@ export default function TutoresPage() {
     });
 
     try {
-      const res = await fetch(`http://www.bakend-notas.somee.com/Tutor/Ingresar?${query.toString()}`, {
+      const res = await fetch(`https://proxy-somee.onrender.com/api/Tutor/Ingresar?${query.toString()}`, {
         method: 'POST'
       });
 
@@ -100,7 +100,7 @@ export default function TutoresPage() {
     if (!confirm(`¿Eliminar al tutor con ID ${id}?`)) return;
 
     try {
-      const res = await fetch(`http://www.bakend-notas.somee.com/Tutor/Eliminar?id=${id}`, {
+      const res = await fetch(`https://proxy-somee.onrender.com/api/Tutor/Eliminar?id=${id}`, {
         method: 'DELETE'
       });
 

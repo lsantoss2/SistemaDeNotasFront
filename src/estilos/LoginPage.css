@@ -1,11 +1,11 @@
-/* Estructura general */
+/* === ESTRUCTURA GENERAL === */
 .login-container {
   display: flex;
   height: 100vh;
   font-family: Arial, sans-serif;
 }
 
-/* Panel izquierdo */
+/* === PANEL IZQUIERDO === */
 .login-left {
   width: 50%;
   background-color: #0a4ad1;
@@ -31,9 +31,10 @@
 .login-left img {
   margin-top: 2rem;
   width: 250px;
+  max-width: 90%;
 }
 
-/* Panel derecho */
+/* === PANEL DERECHO === */
 .login-right {
   width: 50%;
   background: #f3f6fc;
@@ -42,13 +43,14 @@
   align-items: center;
 }
 
-/* Formulario */
+/* === FORMULARIO === */
 .login-form {
   background-color: white;
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 320px;
+  max-width: 90%;
 }
 
 .login-form h2 {
@@ -96,4 +98,63 @@
 
 .login-form .forgot a:hover {
   text-decoration: underline;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-left, .login-right {
+    width: 100%;
+    height: auto;
+    padding: 2rem 1rem;
+  }
+
+  .login-left {
+    order: 2;
+  }
+
+  .login-right {
+    order: 1;
+  }
+
+  .login-left h1 {
+    font-size: 2rem;
+  }
+
+  .login-left p {
+    font-size: 1rem;
+  }
+
+  .login-form {
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-left h1 {
+    font-size: 1.8rem;
+  }
+
+  .login-left p {
+    font-size: 0.95rem;
+  }
+
+  .login-form h2 {
+    font-size: 1.5rem;
+  }
+
+  .login-form input,
+  .login-form button {
+    font-size: 0.95rem;
+    padding: 10px;
+  }
+
+  .login-form .forgot {
+    font-size: 0.85rem;
+  }
 }

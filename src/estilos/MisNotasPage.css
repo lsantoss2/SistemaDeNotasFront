@@ -1,60 +1,119 @@
+/* === CONTENEDOR PRINCIPAL === */
 .mis-notas-container {
-    padding: 2rem;
-    background-color: #f9f9f9;
-  }
-  
+  padding: 2rem;
+  background-color: #f9f9f9;
+}
+
+/* === TÍTULO === */
+.titulo {
+  margin-bottom: 1rem;
+  color: #003366;
+  font-size: 1.8rem;
+}
+
+/* === BOTÓN EXPORTAR === */
+.boton-exportar {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  font-size: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.boton-exportar:hover {
+  background-color: #0056b3;
+}
+
+/* === TARJETA DE ESTUDIANTE === */
+.tarjeta-estudiante {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+}
+
+/* === ENCABEZADO DE LA TARJETA === */
+.encabezado-tarjeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+/* === CHECKBOX === */
+.checkbox-label input {
+  margin-right: 0.5rem;
+  transform: scale(1.2);
+}
+
+/* === TABLA DE NOTAS === */
+.tabla-notas {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabla-notas th, .tabla-notas td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.tabla-notas th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+/* === RESPONSIVE === */
+
+/* Tablets y móviles medianos */
+@media (max-width: 768px) {
   .titulo {
-    margin-bottom: 1rem;
-    color: #003366;
+    font-size: 1.5rem;
   }
-  
-  .boton-exportar {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
-  
-  .boton-exportar:hover {
-    background-color: #0056b3;
-  }
-  
-  .tarjeta-estudiante {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-  }
-  
+
   .encabezado-tarjeta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .checkbox-label input {
-    margin-right: 0.5rem;
-    transform: scale(1.2);
-  }
-  
-  .tabla-notas {
+
+  .boton-exportar {
     width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .tabla-notas th, .tabla-notas td {
-    border: 1px solid #ddd;
-    padding: 8px;
     text-align: center;
   }
-  
-  .tabla-notas th {
-    background-color: #f0f0f0;
-    font-weight: bold;
+
+  .tabla-notas {
+    font-size: 13px;
   }
-  
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  .mis-notas-container {
+    padding: 1rem;
+  }
+
+  .tarjeta-estudiante {
+    padding: 1rem;
+  }
+
+  .boton-exportar {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  .tabla-notas th, .tabla-notas td {
+    padding: 6px;
+  }
+
+  .titulo {
+    font-size: 1.3rem;
+  }
+}

@@ -1,10 +1,13 @@
 body {
   background-color: #f5f8fd;
   font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 .usuarios-page {
   padding: 2rem;
+  box-sizing: border-box;
 }
 
 .encabezado {
@@ -12,11 +15,14 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .encabezado h2 {
   font-size: 24px;
   color: #1e1e2d;
+  margin: 0;
 }
 
 .btn-agregar {
@@ -40,6 +46,9 @@ body {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 15px;
+  max-width: 400px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .tabla-usuarios {
@@ -81,7 +90,7 @@ body {
   color: #007bff;
 }
 
-/* Fondo desenfocado */
+/* Fondo desenfocado para modal */
 .fondo-modal {
   position: fixed;
   top: 0;
@@ -93,7 +102,7 @@ body {
   z-index: 998;
 }
 
-/* Fondo del modal */
+/* Fondo del modal (por seguridad, repetir estilos para compatibilidad) */
 .fondo-modal {
   position: fixed;
   top: 0;
@@ -117,6 +126,7 @@ body {
   transform: translate(-50%, -50%);
   z-index: 1001;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
 }
 
 /* Encabezado */
@@ -134,6 +144,8 @@ body {
   margin: 8px 0;
   box-sizing: border-box;
   font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 /* Botones */
@@ -141,6 +153,7 @@ body {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .acciones-form button {
@@ -149,6 +162,9 @@ body {
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
+  flex: 1 1 auto;
+  min-width: 100px;
+  transition: background-color 0.2s ease;
 }
 
 .acciones-form button[type="submit"] {
@@ -159,4 +175,48 @@ body {
 .acciones-form .cancelar {
   background-color: #6c757d;
   color: white;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .encabezado {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-agregar {
+    width: 100%;
+    text-align: center;
+  }
+
+  .input {
+    max-width: 100%;
+  }
+
+  .formulario-usuario {
+    width: 95%;
+    padding: 16px;
+  }
+
+  .acciones-form {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabla-usuarios th,
+  .tabla-usuarios td {
+    font-size: 13px;
+    padding: 0.6rem 0.5rem;
+  }
+
+  .formulario-usuario h3 {
+    font-size: 1.3rem;
+  }
+
+  .acciones-form button {
+    min-width: 80px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
 }

@@ -14,15 +14,15 @@ export default function HorariosPage() {
         }
 
         // Obtener todos los cursos
-        const resCursos = await fetch('http://www.bakend-notas.somee.com/Curso/Buscar');
+        const resCursos = await fetch('https://proxy-somee.onrender.com/api/Curso/Buscar');
         const cursos = await resCursos.json();
 
         // Obtener todos los estudiantes
-        const resEstudiantes = await fetch('http://www.bakend-notas.somee.com/Estudiante/Buscar');
+        const resEstudiantes = await fetch('https://proxy-somee.onrender.com/api/Estudiante/Buscar');
         const estudiantes = await resEstudiantes.json();
 
         // Obtener ID del tutor desde el usuario
-        const resTutor = await fetch('http://www.bakend-notas.somee.com/Tutor/Buscar');
+        const resTutor = await fetch('https://proxy-somee.onrender.com/api/Tutor/Buscar');
         const tutores = await resTutor.json();
         const tutorEncontrado = tutores.find(t => t.id_usuario === usuario.id);
 
@@ -42,7 +42,7 @@ export default function HorariosPage() {
           const horariosEstudiante = [];
 
           for (const curso of cursosEstudiante) {
-            const resHorario = await fetch(`http://www.bakend-notas.somee.com/Horarios/GetHorario?id_curso=${curso.id_curso}`);
+            const resHorario = await fetch(`https://proxy-somee.onrender.com/api/Horarios/GetHorario?id_curso=${curso.id_curso}`);
             const horario = await resHorario.json();
             horariosEstudiante.push({
               curso: curso.nombre,

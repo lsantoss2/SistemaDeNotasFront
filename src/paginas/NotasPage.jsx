@@ -90,10 +90,10 @@ export default function NotasPage() {
   const cargarDatos = async () => {
     try {
       const [resEstudiantes, resCursos, resNotas, resAsignaciones] = await Promise.all([
-        fetch('http://www.bakend-notas.somee.com/Estudiante/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Curso/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Notas/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Estudiante/Estudiante/Grado/Buscar')
+        fetch('https://proxy-somee.onrender.com/api/Estudiante/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Curso/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Notas/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Estudiante/Estudiante/Grado/Buscar')
       ]);
 
       setEstudiantes(await resEstudiantes.json());
@@ -148,7 +148,7 @@ export default function NotasPage() {
         unidad: parseInt(datos.unidad),
         id_ciclo: 3 // Ciclo fijo
       };
-      url = `http://www.bakend-notas.somee.com/Notas/Modificar?id_nota=${datos.id_nota}`;
+      url = `https://proxy-somee.onrender.com/api/Notas/Modificar?id_nota=${datos.id_nota}`;
     } else {
       payload = {
         id_estudiante: parseInt(datos.id_estudiante),
@@ -158,7 +158,7 @@ export default function NotasPage() {
         grado: parseInt(datos.grado),
         ciclo: 3 // Ciclo fijo
       };
-      url = 'http://www.bakend-notas.somee.com/Notas/Ingresar';
+      url = 'https://proxy-somee.onrender.com/api/Notas/Ingresar';
     }
 
     try {

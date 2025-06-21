@@ -19,10 +19,10 @@ export default function MisNotasPage() {
         return;
       }
 
-      const resEst = await fetch('http://www.bakend-notas.somee.com/Estudiante/Buscar');
+      const resEst = await fetch('https://proxy-somee.onrender.com/api/Estudiante/Buscar');
       const estudiantes = await resEst.json();
 
-      const resTutores = await fetch('http://www.bakend-notas.somee.com/Tutor/Buscar');
+      const resTutores = await fetch('https://proxy-somee.onrender.com/api/Tutor/Buscar');
       const tutores = await resTutores.json();
       const tutor = tutores.find(t => t.id_usuario === usuario.id);
 
@@ -35,11 +35,11 @@ export default function MisNotasPage() {
         est.tutores.some(t => t.id_tutor === tutor.id)
       );
 
-      const resCursos = await fetch('http://www.bakend-notas.somee.com/Curso/Buscar');
+      const resCursos = await fetch('https://proxy-somee.onrender.com/api/Curso/Buscar');
       const cursosData = await resCursos.json();
       setCursos(cursosData);
 
-      const resNotas = await fetch('http://www.bakend-notas.somee.com/Notas/Buscar');
+      const resNotas = await fetch('https://proxy-somee.onrender.com/api/Notas/Buscar');
       const todasNotas = await resNotas.json();
 
       const agrupadas = estudiantesAsociados.map(est => {

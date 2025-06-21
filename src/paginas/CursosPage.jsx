@@ -37,7 +37,7 @@ export default function CursosPage() {
 
   const obtenerCursos = async () => {
     try {
-      const res = await fetch('http://www.bakend-notas.somee.com/Curso/Buscar');
+      const res = await fetch('https://proxy-somee.onrender.com/api/Curso/Buscar');
       const data = await res.json();
       setCursos(data);
       console.log('📚 Cursos cargados:', data);
@@ -48,7 +48,7 @@ export default function CursosPage() {
 
   const obtenerProfesores = async () => {
     try {
-      const res = await fetch('http://www.bakend-notas.somee.com/Profesores/Buscar');
+      const res = await fetch('https://proxy-somee.onrender.com/api/Profesores/Buscar');
       const data = await res.json();
       setProfesores(data);
       console.log('👨‍🏫 Profesores cargados:', data);
@@ -59,7 +59,7 @@ export default function CursosPage() {
 
   const obtenerUsuarios = async () => {
     try {
-      const res = await fetch('http://www.bakend-notas.somee.com/Usuario/Buscar');
+      const res = await fetch('https://proxy-somee.onrender.com/api/Usuario/Buscar');
       const data = await res.json();
       setUsuarios(data);
       console.log('🧑‍💻 Usuarios cargados:', data);
@@ -70,7 +70,7 @@ export default function CursosPage() {
 
   const obtenerGrados = async () => {
     try {
-      const res = await fetch('http://www.bakend-notas.somee.com/Grado/Buscar');
+      const res = await fetch('https://proxy-somee.onrender.com/api/Grado/Buscar');
       const data = await res.json();
       setGrados(data);
       console.log('🎓 Grados cargados:', data);
@@ -100,7 +100,7 @@ export default function CursosPage() {
   const handleEliminar = async (id) => {
     if (!confirm("¿Deseas eliminar este curso?")) return;
     try {
-      const res = await fetch(`http://www.bakend-notas.somee.com/Curso/Eliminar?id_curso=${id}`, {
+      const res = await fetch(`https://proxy-somee.onrender.com/api/Curso/Eliminar?id_curso=${id}`, {
         method: 'DELETE'
       });
       const texto = await res.text();
@@ -133,8 +133,8 @@ export default function CursosPage() {
     console.log('🚀 Enviando payload:', payload);
 
     const url = modoEdicion
-      ? 'http://www.bakend-notas.somee.com/Curso/Modificar'
-      : 'http://www.bakend-notas.somee.com/Curso/Ingresar';
+      ? 'https://proxy-somee.onrender.com/api/Curso/Modificar'
+      : 'https://proxy-somee.onrender.com/api/Curso/Ingresar';
 
     const metodo = modoEdicion ? 'PUT' : 'POST';
 

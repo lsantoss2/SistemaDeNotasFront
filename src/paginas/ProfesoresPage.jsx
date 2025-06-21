@@ -26,9 +26,9 @@ export default function ProfesoresPage() {
   const obtenerDatos = async () => {
     try {
       const [profRes, userRes, cursosRes] = await Promise.all([
-        fetch('http://www.bakend-notas.somee.com/Profesores/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Usuario/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Curso/Buscar')
+        fetch('https://proxy-somee.onrender.com/api/Profesores/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Usuario/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Curso/Buscar')
       ]);
 
       const profesoresData = await profRes.json();
@@ -74,7 +74,7 @@ export default function ProfesoresPage() {
       return;
     }
 
-    const url = `http://www.bakend-notas.somee.com/Profesores/Ingresar?DPI=${dpi}&fecha_contratacion=${fecha}&id_usuario=${id_usuario}`;
+    const url = `https://proxy-somee.onrender.com/api/Profesores/Ingresar?DPI=${dpi}&fecha_contratacion=${fecha}&id_usuario=${id_usuario}`;
 
     try {
       const res = await fetch(url, { method: 'POST' });
@@ -120,7 +120,7 @@ export default function ProfesoresPage() {
     });
 
     try {
-      const res = await fetch(`http://www.bakend-notas.somee.com/Profesores/Modificar?${query.toString()}`, {
+      const res = await fetch(`https://proxy-somee.onrender.com/api/Profesores/Modificar?${query.toString()}`, {
         method: 'PUT'
       });
       const texto = await res.text();
@@ -143,7 +143,7 @@ export default function ProfesoresPage() {
     if (!confirm(`¿Eliminar al profesor con ID ${id_prof}?`)) return;
 
     try {
-      const res = await fetch(`http://www.bakend-notas.somee.com/Profesores/Eliminar?id=${id_prof}`, {
+      const res = await fetch(`https://proxy-somee.onrender.com/api/Profesores/Eliminar?id=${id_prof}`, {
         method: 'DELETE'
       });
 

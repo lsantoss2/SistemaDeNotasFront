@@ -1,72 +1,136 @@
+/* === CONTENEDOR GENERAL === */
 .layout-container {
-    display: flex;
-    height: 100vh;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f5f7fa;
-  }
-  
-  .sidebar {
-    width: 250px;
-    /* background: linear-gradient(to bottom, #1e3a8a, #3b82f6); */
-    color: white;
-    padding: 2rem 1rem;
-    display: flex;
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f7fa;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  width: 250px;
+  min-width: 220px;
+  background: linear-gradient(to bottom, #1e3a8a, #3b82f6);
+  color: white;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Logo */
+.sidebar .logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Navegación */
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar nav li {
+  margin: 1rem 0;
+}
+
+.sidebar nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s ease-in-out;
+}
+
+.sidebar nav a:hover {
+  text-decoration: underline;
+}
+
+/* Botón cerrar sesión */
+.cerrar-sesion-contenedor {
+  margin-top: auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.btn-cerrar-sesion {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.btn-cerrar-sesion:hover {
+  background-color: #dc2626;
+}
+
+/* === CONTENIDO PRINCIPAL === */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background-color: #f9fbfe;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .layout-container {
     flex-direction: column;
   }
-  
-  
-  .sidebar .logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-  
-  .sidebar nav ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .sidebar nav li {
-    margin: 1rem 0;
-  }
-  
-  .sidebar nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  
-  .sidebar nav a:hover {
-    text-decoration: underline;
-  }
-  
-  .main-content {
-    flex: 1;
-    padding: 2rem;
-    overflow-y: auto;
-    background-color: #f9fbfe;
-  }
-  
-  .cerrar-sesion-contenedor {
-    margin-top: auto;
+
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
     padding: 1rem;
     text-align: center;
   }
-  
-  .btn-cerrar-sesion {
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+
+  .sidebar .logo {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
     width: 100%;
   }
-  
-  .btn-cerrar-sesion:hover {
-    background-color: #dc2626;
+
+  .sidebar nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    margin-bottom: 1rem;
   }
-  
+
+  .sidebar nav li {
+    margin: 0;
+  }
+
+  .cerrar-sesion-contenedor {
+    width: 100%;
+    padding-top: 0.5rem;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    padding: 0.8rem;
+  }
+
+  .btn-cerrar-sesion {
+    font-size: 14px;
+    padding: 0.5rem 1rem;
+  }
+}

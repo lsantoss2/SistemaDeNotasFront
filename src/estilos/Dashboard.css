@@ -1,76 +1,154 @@
+/* === GENERAL === */
 .dashboard {
-    display: flex;
-    height: 100vh;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  background: linear-gradient(180deg, #2c2c8c, #3f51b5);
+  color: white;
+  padding: 1.5rem;
+  width: 220px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.sidebar .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin: 1rem 0;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.sidebar li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* === CONTENIDO PRINCIPAL === */
+.main {
+  flex: 1;
+  background: #f4f6fa;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* === ENCABEZADO === */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* === TARJETAS DE ESTADÍSTICA === */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* === BLOQUES DE CONTENIDO === */
+.middle,
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* === TARJETAS === */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  flex: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-width: 280px;
+}
+
+.stat {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* === RESPONSIVE === */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 1024px) {
   .sidebar {
-    background: linear-gradient(180deg, #2c2c8c, #3f51b5);
-    color: white;
-    padding: 1.5rem;
-    width: 220px;
+    width: 180px;
+    padding: 1rem;
   }
-  
-  .sidebar .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 2rem;
-  }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .sidebar li {
-    margin: 1rem 0;
-    cursor: pointer;
-    padding: 0.5rem 0;
-    transition: background 0.2s;
-  }
-  
-  .sidebar li:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .main {
-    flex: 1;
-    background: #f4f6fa;
-    padding: 2rem;
-    overflow-y: auto;
-  }
-  
+
   .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .stats {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
   }
-  
+
+  .sidebar {
+    width: 100%;
+    text-align: center;
+  }
+
+  .sidebar ul {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .sidebar li {
+    margin: 0.5rem;
+  }
+
+  .main {
+    padding: 1rem;
+  }
+
+  .stats,
   .middle,
   .bottom {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 2rem;
+    flex-direction: column;
   }
-  
+}
+
+/* Extra pequeño (iPhone SE, etc.) */
+@media (max-width: 480px) {
   .card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    flex: 1;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 1rem;
   }
-  
+
   .stat {
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 1rem;
   }
-  
+
+  .sidebar .logo {
+    font-size: 1.2rem;
+  }
+}

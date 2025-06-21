@@ -1,11 +1,11 @@
-const API_BASE = 'http://www.bakend-notas.somee.com';
+const API_BASE = 'https://proxy-somee.onrender.com/api';
 
 export const loginUsuario = async (usuario, pass) => {
   try {
     const url = `${API_BASE}/Usuario/Login?usuario=${encodeURIComponent(usuario)}&pass=${encodeURIComponent(pass)}`;
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Accept': 'text/plain' }
+      headers: { 'Accept': 'application/json' }
     });
 
     if (response.ok) {

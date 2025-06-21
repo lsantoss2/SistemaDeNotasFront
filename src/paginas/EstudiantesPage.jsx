@@ -25,7 +25,7 @@ export default function EstudiantesPage() {
 
   const obtenerEstudiantes = async () => {
     try {
-      const res = await fetch('http://www.bakend-notas.somee.com/Estudiante/Buscar');
+      const res = await fetch('https://proxy-somee.onrender.com/api/Estudiante/Buscar');
       const data = await res.json();
       setEstudiantes(data);
     } catch (error) {
@@ -36,8 +36,8 @@ export default function EstudiantesPage() {
   const obtenerTutoresConUsuarios = async () => {
     try {
       const [resTutores, resUsuarios] = await Promise.all([
-        fetch('http://www.bakend-notas.somee.com/Tutor/Buscar'),
-        fetch('http://www.bakend-notas.somee.com/Usuario/Buscar')
+        fetch('https://proxy-somee.onrender.com/api/Tutor/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Usuario/Buscar')
       ]);
 
       const dataTutores = await resTutores.json();
@@ -92,8 +92,8 @@ export default function EstudiantesPage() {
     };
 
     const url = modoEdicion
-      ? 'http://www.bakend-notas.somee.com/Estudiante/Modificar'
-      : 'http://www.bakend-notas.somee.com/Estudiante/Ingresar';
+      ? 'https://proxy-somee.onrender.com/api/Estudiante/Modificar'
+      : 'https://proxy-somee.onrender.com/api/Estudiante/Ingresar';
 
     const metodo = modoEdicion ? 'PUT' : 'POST';
 
@@ -149,7 +149,7 @@ export default function EstudiantesPage() {
     try {
       // Eliminar relaciones en TutorEstudiante
       const resTutorEstudiante = await fetch(
-        `http://www.bakend-notas.somee.com/TutorEstudiante/EliminarPorEstudiante?id_estudiante=${id}`,
+        `https://proxy-somee.onrender.com/api/TutorEstudiante/EliminarPorEstudiante?id_estudiante=${id}`,
         { method: 'DELETE' }
       );
 
@@ -160,7 +160,7 @@ export default function EstudiantesPage() {
 
       // Eliminar relaciones en Notas
       const resNotas = await fetch(
-        `http://www.bakend-notas.somee.com/Notas/EliminarPorEstudiante?id_estudiante=${id}`,
+        `https://proxy-somee.onrender.com/api/Notas/EliminarPorEstudiante?id_estudiante=${id}`,
         { method: 'DELETE' }
       );
 
@@ -171,7 +171,7 @@ export default function EstudiantesPage() {
 
       // Finalmente, eliminar el estudiante
       const resEstudiante = await fetch(
-        `http://www.bakend-notas.somee.com/Estudiante/Eliminar?id_estudiante=${id}`,
+        `https://proxy-somee.onrender.com/api/Estudiante/Eliminar?id_estudiante=${id}`,
         {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' }

@@ -20,7 +20,7 @@ export default function UsuariosPage() {
 
   const obtenerUsuarios = async () => {
     try {
-      const res = await fetch('http://www.bakend-notas.somee.com/Usuario/Buscar');
+      const res = await fetch('https://proxy-somee.onrender.com/api/Usuario/Buscar');
       const data = await res.json();
       setUsuarios(data);
     } catch (error) {
@@ -43,8 +43,8 @@ export default function UsuariosPage() {
     e.preventDefault();
 
     const url = modoEdicion
-      ? 'http://www.bakend-notas.somee.com/Usuario/Modificar'
-      : 'http://www.bakend-notas.somee.com/Usuario/Registro';
+      ? 'https://proxy-somee.onrender.com/api/Usuario/Modificar'
+      : 'https://proxy-somee.onrender.com/api/Usuario/Registro';
 
     const metodo = modoEdicion ? 'PUT' : 'POST';
 
@@ -84,12 +84,12 @@ export default function UsuariosPage() {
   // 🔧 Elimina relación con Profesores si existe
   const eliminarRelacionProfesor = async (id_usuario) => {
     try {
-      const resProf = await fetch('http://www.bakend-notas.somee.com/Profesores/Buscar');
+      const resProf = await fetch('https://proxy-somee.onrender.com/api/Profesores/Buscar');
       const dataProf = await resProf.json();
       const prof = dataProf.find(p => p.id_usuario === id_usuario);
 
       if (prof && prof.id_prof > 0) {
-        const resDel = await fetch(`http://www.bakend-notas.somee.com/Profesores/Eliminar?id_prof=${prof.id_prof}`, {
+        const resDel = await fetch(`https://proxy-somee.onrender.com/api/Profesores/Eliminar?id_prof=${prof.id_prof}`, {
           method: 'DELETE'
         });
         const texto = await resDel.text();
@@ -105,12 +105,12 @@ export default function UsuariosPage() {
   // 🔧 Elimina relación con Tutor si existe
   const eliminarRelacionTutor = async (id_usuario) => {
     try {
-      const resTutor = await fetch('http://www.bakend-notas.somee.com/Tutor/Buscar');
+      const resTutor = await fetch('https://proxy-somee.onrender.com/api/Tutor/Buscar');
       const dataTutor = await resTutor.json();
       const tutor = dataTutor.find(t => t.id_usuario === id_usuario);
 
       if (tutor && tutor.id_tutor > 0) {
-        const resDel = await fetch(`http://www.bakend-notas.somee.com/Tutor/Eliminar?id_tutor=${tutor.id_tutor}`, {
+        const resDel = await fetch(`https://proxy-somee.onrender.com/api/Tutor/Eliminar?id_tutor=${tutor.id_tutor}`, {
           method: 'DELETE'
         });
         const texto = await resDel.text();
@@ -135,7 +135,7 @@ export default function UsuariosPage() {
       await eliminarRelacionProfesor(id_usuario);
       await eliminarRelacionTutor(id_usuario);
 
-      const res = await fetch(`http://www.bakend-notas.somee.com/Usuario/Eliminar?id_user=${id_usuario}`, {
+      const res = await fetch(`https://proxy-somee.onrender.com/api/Usuario/Eliminar?id_user=${id_usuario}`, {
         method: 'DELETE'
       });
 
