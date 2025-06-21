@@ -5,6 +5,7 @@ import autoTable from 'jspdf-autotable';
 export default function MisNotasPage() {
   const [notasPorEstudiante, setNotasPorEstudiante] = useState([]);
   const [cursos, setCursos] = useState([]);
+  const [gradosEstudiantes, setGradosEstudiantes] = useState([]);
   const [estudiantesSeleccionados, setEstudiantesSeleccionados] = useState([]);
 
   useEffect(() => {
@@ -19,28 +20,34 @@ export default function MisNotasPage() {
         return;
       }
 
-      const resEst = await fetch('https://proxy-somee.onrender.com/api/Estudiante/Buscar');
-      const estudiantes = await resEst.json();
+      const [
+        resEst, resTutores, resCursos, resNotas, resGradoEst
+      ] = await Promise.all([
+        fetch('https://proxy-somee.onrender.com/api/Estudiante/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Tutor/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Curso/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Notas/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Estudiante/Estudiante/Grado/Buscar2')
+      ]);
 
-      const resTutores = await fetch('https://proxy-somee.onrender.com/api/Tutor/Buscar');
-      const tutores = await resTutores.json();
+      const [
+        estudiantes, tutores, cursosData, todasNotas, gradosData
+      ] = await Promise.all([
+        resEst.json(), resTutores.json(), resCursos.json(),
+        resNotas.json(), resGradoEst.json()
+      ]);
+
+      setCursos(cursosData);
+      setGradosEstudiantes(gradosData);
+
       const tutor = tutores.find(t => t.id_usuario === usuario.id);
-
-      if (!tutor) {
-        alert('No se encontró tutor asociado.');
-        return;
-      }
+      if (!tutor) return alert('No se encontró tutor asociado.');
 
       const estudiantesAsociados = estudiantes.filter(est =>
         est.tutores.some(t => t.id_tutor === tutor.id)
       );
 
-      const resCursos = await fetch('https://proxy-somee.onrender.com/api/Curso/Buscar');
-      const cursosData = await resCursos.json();
-      setCursos(cursosData);
-
-      const resNotas = await fetch('https://proxy-somee.onrender.com/api/Notas/Buscar');
-      const todasNotas = await resNotas.json();
+      localStorage.setItem('estudiantes_asignados', JSON.stringify(estudiantesAsociados));
 
       const agrupadas = estudiantesAsociados.map(est => {
         const notasEst = todasNotas.filter(n => n.id_estudiante === est.id_estudiante);
@@ -77,11 +84,8 @@ export default function MisNotasPage() {
 
   const exportarPDF = () => {
     const doc = new jsPDF();
-    let y = 10;
-
-    doc.setFontSize(16);
-    doc.text('Reporte de Notas por Estudiante', 14, y);
-    y += 10;
+    let y = 20;
+    const fechaHoy = new Date().toLocaleDateString('es-GT');
 
     const seleccionados = notasPorEstudiante.filter(({ estudiante }) =>
       estudiantesSeleccionados.includes(estudiante.id_estudiante)
@@ -92,13 +96,29 @@ export default function MisNotasPage() {
       return;
     }
 
-    seleccionados.forEach(({ estudiante, notas, id_grado }) => {
-      doc.setFontSize(12);
-      doc.setTextColor(33, 37, 41);
-      doc.text(`${estudiante.nombre}`, 14, y);
-      y += 6;
+    seleccionados.forEach(({ estudiante, notas }) => {
+      const gradoEst = gradosEstudiantes.find(g => g.carnet === estudiante.carnet);
 
-      const cursosFiltrados = cursos.filter(c => c.id_grado === id_grado);
+      console.log("📌 Estudiante:", estudiante);
+      console.log("📚 Datos desde EstudianteGrado Buscar2:", gradoEst);
+
+      const nombreGrado = gradoEst?.grado || 'N/A';
+      const nombreCiclo = gradoEst?.ciclo?.toString() || 'N/A';
+
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('COLEGIO BELÉN', 105, y, { align: 'center' });
+      y += 10;
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Nombre del alumno: ${estudiante.nombre} ${estudiante.apellido}`, 14, y); y += 6;
+      doc.text(`Carnet: ${estudiante.carnet || 'N/A'}`, 14, y); y += 6;
+      doc.text(`Grado: ${nombreGrado}`, 14, y); y += 6;
+      doc.text(`Ciclo: ${nombreCiclo}`, 14, y); y += 6;
+      doc.text(`Fecha: ${fechaHoy}`, 14, y); y += 10;
+
+      const cursosFiltrados = cursos.filter(c => c.id_grado === notas[0]?.id_grado);
       const filas = cursosFiltrados.map(curso => {
         const notasCurso = notas.filter(n => n.id_curso === curso.id_curso);
         const porUnidad = {};
@@ -123,7 +143,12 @@ export default function MisNotasPage() {
         theme: 'grid',
       });
 
-      y = doc.lastAutoTable.finalY + 10;
+      y = doc.lastAutoTable.finalY + 15;
+
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
     });
 
     doc.save('ReporteNotas.pdf');
@@ -142,9 +167,9 @@ export default function MisNotasPage() {
   };
 
   return (
-    <div className="contenedor">
-      <h2>📘 Mis Notas</h2>
-      <button onClick={exportarPDF} className="btn btn-primary" style={{ marginBottom: '20px' }}>
+    <div className="mis-notas-container">
+      <h2 className="titulo">📘 Mis Notas</h2>
+      <button onClick={exportarPDF} className="boton-exportar">
         📄 Exportar PDF
       </button>
 
@@ -165,16 +190,20 @@ export default function MisNotasPage() {
           });
 
           return (
-            <div key={estudiante.id_estudiante} style={{ marginBottom: '2rem' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <input
-                  type="checkbox"
-                  checked={estudiantesSeleccionados.includes(estudiante.id_estudiante)}
-                  onChange={() => toggleSeleccion(estudiante.id_estudiante)}
-                />
-                <h3 style={{ margin: 0 }}>Notas de {estudiante.nombre} {estudiante.apellido}</h3>
-              </label>
-              <table className="table">
+            <div key={estudiante.id_estudiante} className="tarjeta-estudiante">
+              <div className="encabezado-tarjeta">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={estudiantesSeleccionados.includes(estudiante.id_estudiante)}
+                    onChange={() => toggleSeleccion(estudiante.id_estudiante)}
+                  />
+                  <span className="nombre-estudiante">
+                    Notas de {estudiante.nombre} {estudiante.apellido}
+                  </span>
+                </label>
+              </div>
+              <table className="tabla-notas">
                 <thead>
                   <tr>
                     <th>Curso</th>
@@ -193,21 +222,12 @@ export default function MisNotasPage() {
                         const nota = curso.notasPorUnidad[unidad];
                         const esNotaBaja = nota !== '—' && parseFloat(nota) < 60;
                         return (
-                          <td
-                            key={unidad}
-                            style={{
-                              color: esNotaBaja ? 'red' : 'inherit'
-                            }}
-                          >
+                          <td key={unidad} className={esNotaBaja ? 'roja' : ''}>
                             {nota}
                           </td>
                         );
                       })}
-                      <td
-                        style={{
-                          color: curso.promedio !== '—' && parseFloat(curso.promedio) < 60 ? 'red' : 'inherit'
-                        }}
-                      >
+                      <td className={curso.promedio !== '—' && parseFloat(curso.promedio) < 60 ? 'roja' : ''}>
                         {curso.promedio}
                       </td>
                     </tr>
