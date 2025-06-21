@@ -7,8 +7,8 @@ export default function UsuariosPage() {
     id_usuario: '',
     usuario: '',
     nombre: '',
-    apellido: '',
-    pass: '',
+    apellidos: '',
+    contrasena: '',
     rol: ''
   });
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -64,8 +64,8 @@ export default function UsuariosPage() {
           id_usuario: '',
           usuario: '',
           nombre: '',
-          apellido: '',
-          pass: '',
+          apellidos: '',
+          contrasena: '',
           rol: ''
         });
         setModoEdicion(false);
@@ -81,7 +81,6 @@ export default function UsuariosPage() {
     }
   };
 
-  // 🔧 Elimina relación con Profesores si existe
   const eliminarRelacionProfesor = async (id_usuario) => {
     try {
       const resProf = await fetch('https://proxy-somee.onrender.com/api/Profesores/Buscar');
@@ -94,15 +93,12 @@ export default function UsuariosPage() {
         });
         const texto = await resDel.text();
         console.log("🧹 Profesor eliminado:", texto);
-      } else {
-        console.log("⚠️ No se encontró un profesor válido para eliminar.");
       }
     } catch (error) {
       console.warn("⚠️ Error al eliminar relación profesor:", error);
     }
   };
 
-  // 🔧 Elimina relación con Tutor si existe
   const eliminarRelacionTutor = async (id_usuario) => {
     try {
       const resTutor = await fetch('https://proxy-somee.onrender.com/api/Tutor/Buscar');
@@ -115,8 +111,6 @@ export default function UsuariosPage() {
         });
         const texto = await resDel.text();
         console.log("🧹 Tutor eliminado:", texto);
-      } else {
-        console.log("⚠️ No se encontró un tutor válido para eliminar.");
       }
     } catch (error) {
       console.warn("⚠️ Error al eliminar relación tutor:", error);
@@ -124,7 +118,7 @@ export default function UsuariosPage() {
   };
 
   const handleEliminar = async (id_usuario) => {
-    if (!id_usuario || id_usuario === undefined) {
+    if (!id_usuario) {
       alert("❌ ID no válido para eliminación");
       return;
     }
@@ -157,8 +151,8 @@ export default function UsuariosPage() {
       id_usuario: user.id_usuario,
       usuario: user.usuario,
       nombre: user.nombre,
-      apellido: user.apellido,
-      pass: user.pass,
+      apellidos: user.apellido,
+      contrasena: user.pass,
       rol: user.rol
     });
     setModoEdicion(true);
@@ -197,8 +191,8 @@ export default function UsuariosPage() {
             id_usuario: '',
             usuario: '',
             nombre: '',
-            apellido: '',
-            pass: '',
+            apellidos: '',
+            contrasena: '',
             rol: ''
           });
           setModoEdicion(false);
@@ -257,9 +251,9 @@ export default function UsuariosPage() {
           <form className="formulario-usuario" onSubmit={handleSubmit}>
             <h3>{modoEdicion ? 'Editar Usuario' : 'Registrar Usuario'}</h3>
             <input name="nombre" placeholder="Nombre" value={formulario.nombre} onChange={handleChange} required />
-            <input name="apellido" placeholder="Apellido" value={formulario.apellido} onChange={handleChange} required />
+            <input name="apellidos" placeholder="Apellidos" value={formulario.apellidos} onChange={handleChange} required />
             <input name="usuario" placeholder="Usuario" value={formulario.usuario} onChange={handleChange} required disabled={modoEdicion} />
-            <input type="password" name="pass" placeholder="Contraseña" value={formulario.pass} onChange={handleChange} required />
+            <input type="password" name="contrasena" placeholder="Contraseña" value={formulario.contrasena} onChange={handleChange} required />
             <select name="rol" value={formulario.rol} onChange={handleChange} required>
               <option value="">Seleccionar rol</option>
               <option value="0">Administrador</option>

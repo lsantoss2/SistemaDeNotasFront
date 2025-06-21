@@ -9,7 +9,7 @@ function FormularioNota({ onSubmit, onCancel, notaInicial = {} }) {
     nota: notaInicial.nota || '',
     unidad: notaInicial.unidad || '',
     grado: notaInicial.grado || '',
-    ciclo: 3 // Ciclo fijo
+    ciclo: 3
   });
 
   const handleChange = (e) => {
@@ -77,6 +77,7 @@ export default function NotasPage() {
   const [cursos, setCursos] = useState([]);
   const [notas, setNotas] = useState([]);
   const [asignaciones, setAsignaciones] = useState([]);
+  const [gradosNombres, setGradosNombres] = useState([]);
   const [modalEstudiante, setModalEstudiante] = useState(null);
   const [formularioNota, setFormularioNota] = useState(null);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -89,17 +90,19 @@ export default function NotasPage() {
 
   const cargarDatos = async () => {
     try {
-      const [resEstudiantes, resCursos, resNotas, resAsignaciones] = await Promise.all([
+      const [resEstudiantes, resCursos, resNotas, resAsignaciones, resGrados] = await Promise.all([
         fetch('https://proxy-somee.onrender.com/api/Estudiante/Buscar'),
         fetch('https://proxy-somee.onrender.com/api/Curso/Buscar'),
         fetch('https://proxy-somee.onrender.com/api/Notas/Buscar'),
-        fetch('https://proxy-somee.onrender.com/api/Estudiante/Estudiante/Grado/Buscar')
+        fetch('https://proxy-somee.onrender.com/api/Estudiante/Estudiante/Grado/Buscar'),
+        fetch('https://proxy-somee.onrender.com/api/Estudiante/Estudiante/Grado/Buscar2')
       ]);
 
       setEstudiantes(await resEstudiantes.json());
       setCursos(await resCursos.json());
       setNotas(await resNotas.json());
       setAsignaciones(await resAsignaciones.json());
+      setGradosNombres(await resGrados.json());
     } catch (error) {
       alert('❌ Error al cargar datos');
       console.error(error);
@@ -125,7 +128,7 @@ export default function NotasPage() {
       nota: notaObj ? notaObj.nota : '',
       unidad: unidad,
       grado: grado,
-      ciclo: 3 // Ciclo fijo
+      ciclo: 3
     });
     setModoEdicion(!!notaObj);
   };
@@ -146,7 +149,7 @@ export default function NotasPage() {
         id_curso: parseInt(datos.id_curso),
         nota: parseFloat(datos.nota),
         unidad: parseInt(datos.unidad),
-        id_ciclo: 3 // Ciclo fijo
+        id_ciclo: 3
       };
       url = `https://proxy-somee.onrender.com/api/Notas/Modificar?id_nota=${datos.id_nota}`;
     } else {
@@ -156,7 +159,7 @@ export default function NotasPage() {
         nota: parseFloat(datos.nota),
         unidad: parseInt(datos.unidad),
         grado: parseInt(datos.grado),
-        ciclo: 3 // Ciclo fijo
+        ciclo: 3
       };
       url = 'https://proxy-somee.onrender.com/api/Notas/Ingresar';
     }
@@ -188,17 +191,11 @@ export default function NotasPage() {
     return porUnidad;
   };
 
-  const gradoALetras = (numero) => {
-    const grados = {
-      1: 'Primero',
-      2: 'Segundo',
-      3: 'Tercero',
-      4: 'Cuarto',
-      5: 'Quinto',
-      6: 'Sexto',
-      7: 'Séptimo'
-    };
-    return grados[numero] || 'N/A';
+  const obtenerNombreGrado = (est) => {
+    const relacion = asignaciones.find(a => a.id_estudiante === est.id_estudiante);
+    const gradoEst = relacion ? relacion.id_grado : null;
+    const gradoObj = gradosNombres.find(g => g.carnet === est.carnet);
+    return gradoObj ? gradoObj.grado : 'N/A';
   };
 
   const filtrarEstudiantes = estudiantes.filter(est => {
@@ -208,9 +205,8 @@ export default function NotasPage() {
       est.apellido.toLowerCase().includes(texto) ||
       est.carnet.toString().includes(texto)
     );
-    const relacion = asignaciones.find(a => a.id_estudiante === est.id_estudiante);
-    const gradoEstudiante = relacion ? relacion.id_grado : null;
-    const coincideGrado = gradoFiltro ? (gradoEstudiante === parseInt(gradoFiltro)) : true;
+    const gradoNombre = obtenerNombreGrado(est);
+    const coincideGrado = gradoFiltro ? (gradoNombre === gradoFiltro) : true;
     return coincideBusqueda && coincideGrado;
   });
 
@@ -226,8 +222,8 @@ export default function NotasPage() {
         />
         <select value={gradoFiltro} onChange={(e) => setGradoFiltro(e.target.value)}>
           <option value="">Todos los grados</option>
-          {[1,2,3,4,5,6,7].map(g => (
-            <option key={g} value={g}>{gradoALetras(g)}</option>
+          {[...new Set(gradosNombres.map(g => g.grado))].map((nombreGrado, i) => (
+            <option key={i} value={nombreGrado}>{nombreGrado}</option>
           ))}
         </select>
       </div>
@@ -242,19 +238,15 @@ export default function NotasPage() {
           </tr>
         </thead>
         <tbody>
-          {filtrarEstudiantes.map((est, idx) => {
-            const relacion = asignaciones.find(a => a.id_estudiante === est.id_estudiante);
-            const gradoEstudiante = relacion ? gradoALetras(relacion.id_grado) : 'N/A';
-            return (
-              <tr key={est.id_estudiante}>
-                <td>{idx + 1}</td>
-                <td>{est.nombre} {est.apellido}</td>
-                <td>{est.carnet}</td>
-                <td>{gradoEstudiante}</td>
-                <td><button onClick={() => abrirModalEstudiante(est)}>🔍 Ver Detalles</button></td>
-              </tr>
-            );
-          })}
+          {filtrarEstudiantes.map((est, idx) => (
+            <tr key={est.id_estudiante}>
+              <td>{idx + 1}</td>
+              <td>{est.nombre} {est.apellido}</td>
+              <td>{est.carnet}</td>
+              <td>{obtenerNombreGrado(est)}</td>
+              <td><button onClick={() => abrirModalEstudiante(est)}>🔍 Ver Detalles</button></td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
